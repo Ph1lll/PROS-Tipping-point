@@ -2,25 +2,31 @@
 
 
 // Stating Components
-	Controller master (E_CONTROLLER_MASTER);
-	Motor LBM(4 , E_MOTOR_GEARSET_18 , true);
-	Motor LFM(8, E_MOTOR_GEARSET_18, true);
-	Motor RFM(7, E_MOTOR_GEARSET_18, false);
-	Motor RBM(5, E_MOTOR_GEARSET_18, false);
-	Motor DR4BL(6, E_MOTOR_GEARSET_36, true);
-	Motor DR4BR(11, E_MOTOR_GEARSET_36, false);
+	// V5 Parts
+		// Controller
+			Controller master (E_CONTROLLER_MASTER);
+		// Motors
+			Motor LBM(4 , E_MOTOR_GEARSET_18 , true);
+			Motor LFM(8, E_MOTOR_GEARSET_18, true);
+			Motor RFM(7, E_MOTOR_GEARSET_18, false);
+			Motor RBM(5, E_MOTOR_GEARSET_18, false);
+			Motor DR4BL(6, E_MOTOR_GEARSET_36, true);
+			Motor DR4BR(11, E_MOTOR_GEARSET_36, false);
+	// 3 wire ports
+		// Encoders
+			ADIEncoder LeftY("A","B" ,false);
+			ADIEncoder RightY("C","D", false);
+			ADIEncoder midX("E","F", false);
 
 // Global Variables
+	bool usercontrol = false;
 
+	// PID desired
+		double desired = 0;
+		double sesired = 0;
+		float tesired = 0;
 
-
-
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
+// LLEMU's center button
 void on_center_button() {
 	static bool pressed = false;
 	pressed = !pressed;
@@ -72,27 +78,88 @@ void competition_initialize() {
 // PID system for autonomous that hopefully gets implemented
 int drovePID() {
 
+	// Encoders
+		double yPos = (LeftY.get_value() + RightY.get_value())/2;
+		double xPos = midX.get_value();
+		double tspoon  = (LeftY.get_value() - RightY.get_value())/2;
+	// PID system
+    // y Position
+      double error = 0;
+      double prevError = 0;
+      double deriv = 0;
+    // x Pos
+      double serror = 0;
+      double sPrevError = 0;
+      double seriv = 0;
+    // Turning
+      float terror = 0;
+      float tPrevError = 0;
+      float teriv = 0;
+
+	// Konstants
+    // Going forward
+      double kP = 0;
+      double kI = 0;
+      double kD = 0;
+    // Side
+      double skP = 0;
+      double skI = 0;
+     	double skD = 0;
+    // Turning
+      double tkP = 0;
+      double tkI = 0;
+      double tkD = 0;
+
+	while (!usercontrol) {
+		// PID yPos
+      error = yPos - desired;
+      prevError += error;
+      deriv = error - prevError;
+    // PID xPos
+      serror = xPos - sesired;
+      sPrevError += serror;
+      seriv = serror - sPrevError;
+    // PID Turning
+      terror = tspoon - tesired;
+      tPrevError += terror;
+      teriv = terror - tPrevError;
+
+		// Lateral movement
+      float proton = (error * kP) + (prevError * kI) + (deriv * kD);
+      float neutron = (serror * skP) + (sPrevError * skI) + (seriv * skD);
+      float electron = (terror * tkP) + (tPrevError * tkI) + (teriv * tkD);
+
+    // Motor Asignment
+			LBM.move_velocity(proton - neutron + electron);
+      LFM.move_velocity(proton + neutron + electron);
+      RBM.move_velocity(proton + neutron - electron);
+      RFM.move_velocity(proton - neutron - electron);
+
+			delay(20);
+		}
 	return 1;
 }
 
-
+// Autonomous code
 void autonomous() {
+Task drivePD(drovePID);
+
 
 }
 
 void opcontrol() {
-	while (true) {
-
+	usercontrol = true
+	while (usercontrol) {
 	// Driving
 		// CONTROLLER
-			float pwr = master.get_analog(ANALOG_LEFT_Y);
+			float mpwr = master.get_analog(ANALOG_LEFT_Y);
 			float side = master.get_analog(ANALOG_LEFT_X);
 			float turn = master.get_analog(ANALOG_RIGHT_X);
 		// Motors
-			LBM.move(pwr - side + turn);
-			LFM.move(pwr + side + turn);
-			RBM.move(pwr + side - turn);
-			RFM.move(pwr - side - turn);
+			LBM.move(mpwr - side + turn);
+			LFM.move(mpwr + side + turn);
+			RBM.move(mpwr + side - turn);
+			RFM.move(mpwr - side - turn);
 
 	// Special Stuff
 		// Lifting
@@ -100,7 +167,7 @@ void opcontrol() {
 			DR4BL.move(liftpwr);
 			DR4BR.move(liftpwr);
 		// Ringles
-			
+
 
 		delay(20);
 	}
