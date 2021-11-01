@@ -1,3 +1,5 @@
+// 2976G Tipping Point Code
+
 #include "main.h"
 
 
@@ -14,9 +16,9 @@
 			Motor DR4BR(11, E_MOTOR_GEARSET_36, false);
 	// 3 wire ports
 		// Encoders
-			ADIEncoder LeftY("A","B" ,false);
-			ADIEncoder RightY("C","D", false);
-			ADIEncoder midX("E","F", false);
+			ADIEncoder LeftY(1, 2, false);
+			ADIEncoder RightY(3, 4, false);
+			ADIEncoder midX(5, 6, false);
 
 // Global Variables
 	bool usercontrol = false;
@@ -79,9 +81,10 @@ void competition_initialize() {
 int drovePID() {
 
 	// Encoders
-		double yPos = (LeftY.get_value() + RightY.get_value())/2;
-		double xPos = midX.get_value();
-		double tspoon  = (LeftY.get_value() - RightY.get_value())/2;
+		//
+			double yPos = LeftY.get_value() + RightY.get_value();
+			double xPos = midX.get_value();
+			double tspoon  = LeftY.get_value() - RightY.get_value();
 	// PID system
     // y Position
       double error = 0;
@@ -148,7 +151,7 @@ Task drivePD(drovePID);
 }
 
 void opcontrol() {
-	usercontrol = true
+	usercontrol = true;
 	while (usercontrol) {
 	// Driving
 		// CONTROLLER
