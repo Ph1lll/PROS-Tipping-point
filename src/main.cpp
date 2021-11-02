@@ -8,13 +8,16 @@
 		// Controller
 			Controller master (E_CONTROLLER_MASTER);
 		// Motors
-			Motor LBM(4 , E_MOTOR_GEARSET_18 , true);
+			Motor	LBM(4 , E_MOTOR_GEARSET_18 , true);
 			Motor LFM(8, E_MOTOR_GEARSET_18, true);
 			Motor RFM(7, E_MOTOR_GEARSET_18, false);
 			Motor RBM(5, E_MOTOR_GEARSET_18, false);
 			Motor DR4BL(6, E_MOTOR_GEARSET_36, true);
 			Motor DR4BR(11, E_MOTOR_GEARSET_36, false);
-	// 3 wire ports
+			Motor	Ringle_Mtr(13, E_MOTOR_GEARSET_18, false);
+	// Sensors
+		// Distance
+			Distance Ringle_Dis(12);
 		// Encoders
 			ADIEncoder LeftY(1, 2, false);
 			ADIEncoder RightY(3, 4, false);
@@ -170,7 +173,13 @@ void opcontrol() {
 			DR4BL.move(liftpwr);
 			DR4BR.move(liftpwr);
 		// Ringles
-
+			if(Ringle_Dis.get() < 180 && !master.get_digital(DIGITAL_Y)) {
+				Ringle_Mtr.move_velocity(100);
+			} else if (master.get_digital(DIGITAL_Y)) {
+				Ringle_Mtr.move_velocity(-100);
+			} else {
+				Ringle_Mtr.set_brake_mode(E_MOTOR_BRAKE_COAST);
+			}
 
 		delay(20);
 	}
