@@ -14,14 +14,14 @@
 			Motor RBM(5, E_MOTOR_GEARSET_18, false);
 			Motor DR4BL(6, E_MOTOR_GEARSET_36, true);
 			Motor DR4BR(11, E_MOTOR_GEARSET_36, false);
-			Motor	Ringle_Mtr(13, E_MOTOR_GEARSET_18, false);
+			Motor	R_MTR(13, E_MOTOR_GEARSET_18, false);
 	// Sensors
 		// Distance
-			Distance Ringle_Dis(12);
+			Distance R_DIS(12);
 		// Encoders
-			ADIEncoder LeftY(1, 2, false);
-			ADIEncoder RightY(3, 4, false);
-			ADIEncoder midX(5, 6, false);
+			ADIEncoder LYEN(1, 2, false);
+			ADIEncoder RYEN(3, 4, false);
+			ADIEncoder XEN(5, 6, false);
 
 // Global Variables
 	bool usercontrol = false;
@@ -85,9 +85,9 @@ int drovePID() {
 
 	// Encoders
 		//
-			double yPos = LeftY.get_value() + RightY.get_value();
-			double xPos = midX.get_value();
-			double tspoon  = LeftY.get_value() - RightY.get_value();
+			double yPos = LYEN.get_value() + RYEN.get_value();
+			double xPos = XEN.get_value();
+			double tspoon  = LYEN.get_value() - RYEN.get_value();
 	// PID system
     // y Position
       double error = 0;
@@ -173,12 +173,12 @@ void opcontrol() {
 			DR4BL.move(liftpwr);
 			DR4BR.move(liftpwr);
 		// Ringles
-			if(Ringle_Dis.get() < 180 && !master.get_digital(DIGITAL_Y)) {
-				Ringle_Mtr.move_velocity(100);
+			if(R_DIS.get() < 180 && !master.get_digital(DIGITAL_Y)) {
+				R_MTR.move_velocity(100);
 			} else if (master.get_digital(DIGITAL_Y)) {
-				Ringle_Mtr.move_velocity(-100);
+				R_MTR.move_velocity(-100);
 			} else {
-				Ringle_Mtr.set_brake_mode(E_MOTOR_BRAKE_COAST);
+				R_MTR.set_brake_mode(E_MOTOR_BRAKE_COAST);
 			}
 
 		delay(20);
