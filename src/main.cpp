@@ -2,17 +2,16 @@
 
 #include "main.h"
 
-
 // Stating Components
 	// V5 Parts
 		// Controller
 			Controller master (E_CONTROLLER_MASTER);
 		// Motors
 			Motor	LBM(4 , E_MOTOR_GEARSET_18 , true);
-			Motor 	LFM(8, E_MOTOR_GEARSET_18, true);
-			Motor 	RFM(7, E_MOTOR_GEARSET_18, false);
-			Motor 	RBM(5, E_MOTOR_GEARSET_18, false);
-			Motor 	DR4BL(6, E_MOTOR_GEARSET_36, true);
+			Motor	LFM(8, E_MOTOR_GEARSET_18, true);
+			Motor RFM(7, E_MOTOR_GEARSET_18, false);
+			Motor RBM(5, E_MOTOR_GEARSET_18, false);
+			Motor DR4BL(6, E_MOTOR_GEARSET_36, true);
 			Motor	DR4BR(11, E_MOTOR_GEARSET_36, false);
 			Motor	R_MTR(13, E_MOTOR_GEARSET_18, false);
 	// Sensors
