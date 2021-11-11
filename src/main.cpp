@@ -13,10 +13,9 @@
 			Motor RBM(5, E_MOTOR_GEARSET_18, false);
 			Motor DR4BL(6, E_MOTOR_GEARSET_36, true);
 			Motor	DR4BR(11, E_MOTOR_GEARSET_36, false);
-			Motor	R_MTR(13, E_MOTOR_GEARSET_18, false);
 	// Sensors
-		// Distance
-			Distance R_DIS(12);
+		// Piston
+			ADIDigitalOut CLAMPY(7);
 		// Encoders
 			ADIEncoder LYEN(1, 2, false);
 			ADIEncoder RYEN(3, 4, false);
@@ -27,8 +26,7 @@
 
 	// PID desired
 		double desired = 0;
-		double sesired = 0;
-		float tesired = 0;
+		double tesired = 0;
 
 // LLEMU's center button
 void on_center_button() {
@@ -106,10 +104,6 @@ int drovePID() {
       double kP = 0;
       double kI = 0;
       double kD = 0;
-    // Side
-      double skP = 0;
-      double skI = 0;
-     	double skD = 0;
     // Turning
       double tkP = 0;
       double tkI = 0;
@@ -120,25 +114,20 @@ int drovePID() {
       error = yPos - desired;
       prevError += error;
       deriv = error - prevError;
-    // PID xPos
-      serror = xPos - sesired;
-      sPrevError += serror;
-      seriv = serror - sPrevError;
     // PID Turning
       terror = tspoon - tesired;
       tPrevError += terror;
       teriv = terror - tPrevError;
 
 		// Lateral movement
-      float proton = (error * kP) + (prevError * kI) + (deriv * kD);
-      float neutron = (serror * skP) + (sPrevError * skI) + (seriv * skD);
-      float electron = (terror * tkP) + (tPrevError * tkI) + (teriv * tkD);
+      double proton = (error * kP) + (prevError * kI) + (deriv * kD);
+      double electron = (terror * tkP) + (tPrevError * tkI) + (teriv * tkD);
 
     // Motor Asignment
-			LBM.move_velocity(proton - neutron + electron);
-      LFM.move_velocity(proton + neutron + electron);
-      RBM.move_velocity(proton + neutron - electron);
-      RFM.move_velocity(proton - neutron - electron);
+			LBM.move_velocity(proton + electron);
+      LFM.move_velocity(proton + electron);
+      RBM.move_velocity(proton - electron);
+      RFM.move_velocity(proton - electron);
 
 			delay(20);
 		}
@@ -158,27 +147,20 @@ void opcontrol() {
 	// Driving
 		// CONTROLLER
 			float mpwr = master.get_analog(ANALOG_LEFT_Y);
-			float side = master.get_analog(ANALOG_LEFT_X);
 			float turn = master.get_analog(ANALOG_RIGHT_X);
 		// Motors
-			LBM.move(mpwr - side + turn);
-			LFM.move(mpwr + side + turn);
-			RBM.move(mpwr + side - turn);
-			RFM.move(mpwr - side - turn);
+			LBM.move(mpwr + turn);
+			LFM.move(mpwr + turn);
+			RBM.move(mpwr - turn);
+			RFM.move(mpwr - turn);
 
 	// Special Stuff
+		// Clampy
+			CLAMPY.set_value(master.get_digital(DIGITAL_R2) - master.get_digital(DIGITAL_R1));
 		// Lifting
 			double liftpwr = 127 * (master.get_digital(DIGITAL_R2) - master.get_digital(DIGITAL_R1));
 			DR4BL.move(liftpwr);
 			DR4BR.move(liftpwr);
-		// Ringles
-			if(R_DIS.get() < 180 && !master.get_digital(DIGITAL_Y)) {
-				R_MTR.move_velocity(100);
-			} else if (master.get_digital(DIGITAL_Y)) {
-				R_MTR.move_velocity(-100);
-			} else {
-				R_MTR.set_brake_mode(E_MOTOR_BRAKE_COAST);
-			}
 
 		delay(20);
 	}
