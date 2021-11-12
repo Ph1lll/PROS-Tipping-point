@@ -5,17 +5,34 @@
 // Stating Components
 	// V5 Parts
 		// Controller
+			// Name of the controller is master since it's the main controller incase we use 2 controllers
 			Controller master (E_CONTROLLER_MASTER);
+			// This is if we use a 2nd controller
+			Controller partner (E_CONTROLLER_PARTNER);
 		// Motors
+			/*
+				The initialization of motors requires 4 things
+				Name of the motor
+				Declareing what port the motor is
+				What gearset the motor uses
+					Blue  6:1  E_MOTOR_GEARSET_06
+Default:	Green 18:1 E_MOTOR_GEARSET_18
+					Red   36:1 E_MOTOR_GEARSET_36
+				And if it's reversed
+			*/
 			Motor	LBM(4 , E_MOTOR_GEARSET_18 , true);
 			Motor	LFM(8, E_MOTOR_GEARSET_18, true);
 			Motor RFM(7, E_MOTOR_GEARSET_18, false);
 			Motor RBM(5, E_MOTOR_GEARSET_18, false);
 			Motor DR4BL(6, E_MOTOR_GEARSET_36, false);
 			Motor	DR4BR(11, E_MOTOR_GEARSET_36, true);
+	// Piston
+		/*
+			ADI is for the tri port
+			CLAMPY is the piston for the front clamp
+		*/
+		ADIDigitalOut CLAMPY(7);
 	// Sensors
-		// Piston
-			ADIDigitalOut CLAMPY(7);
 		// Encoders
 			ADIEncoder LYEN(1, 2, false);
 			ADIEncoder RYEN(3, 4, false);
@@ -39,7 +56,7 @@ void on_center_button() {
 	}
 }
 
-/**
+/*
  * Runs initialization code. This occurs as soon as the program is started.
  *
  * All other competition modes are blocked by initialize; it is recommended
@@ -55,14 +72,14 @@ void initialize() {
 
 
 
-/**
+/*
  * Runs while the robot is in the disabled state of Field Management System or
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
 void disabled() {}
 
-/**
+/*
  * Runs after initialize(), and before autonomous when connected to the Field
  * Management System or the VEX Competition Switch. This is intended for
  * competition-specific initialization routines, such as an autonomous selector
@@ -86,14 +103,10 @@ int drovePID() {
 			double xPos = XEN.get_value();
 			double tspoon  = LYEN.get_value() - RYEN.get_value();
 	// PID system
-    // y Position
+    // Position
       double error = 0;
       double prevError = 0;
       double deriv = 0;
-    // x Pos
-      double serror = 0;
-      double sPrevError = 0;
-      double seriv = 0;
     // Turning
       float terror = 0;
       float tPrevError = 0;
@@ -141,18 +154,33 @@ Task drivePD(drovePID);
 
 }
 
+/*
+	This is the driver control code
+*/
 void opcontrol() {
 	usercontrol = true;
 	while (usercontrol) {
 	// Driving
 		// CONTROLLER
-			float mpwr = master.get_analog(ANALOG_LEFT_Y);
-			float turn = master.get_analog(ANALOG_RIGHT_X);
+			/*
+				Our team uses the Arcade Control system instad of tank due to its simplicity
+				mPwr is a variable to move the bot forward or backwards based on value from the verticle axis of the left joystick
+				turn is a variable to turning the robot round the center of it, the value of turn is from the horizontial axis of the right joystick
+			*/
+			double mPwr = master.get_analog(ANALOG_LEFT_Y);
+			double turn = master.get_analog(ANALOG_RIGHT_X);
 		// Motors
-			LBM.move(mpwr + turn);
-			LFM.move(mpwr + turn);
-			RBM.move(mpwr - turn);
-			RFM.move(mpwr - turn);
+			/*
+				(motor).move function moves the motors
+				mPwr moves the bot back and forward
+				turn rotates the robot
+				E.G. if I move the right joystick to the right the
+				left set of the wheels would speed up and the right set would slow down
+			*/
+			LBM.move(mPwr + turn);
+			LFM.move(mPwr + turn);
+			RBM.move(mPwr - turn);
+			RFM.move(mPwr - turn);
 
 	// Special Stuff
 		// Clampy
