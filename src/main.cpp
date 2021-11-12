@@ -11,8 +11,8 @@
 			Motor	LFM(8, E_MOTOR_GEARSET_18, true);
 			Motor RFM(7, E_MOTOR_GEARSET_18, false);
 			Motor RBM(5, E_MOTOR_GEARSET_18, false);
-			Motor DR4BL(6, E_MOTOR_GEARSET_36, true);
-			Motor	DR4BR(11, E_MOTOR_GEARSET_36, false);
+			Motor DR4BL(6, E_MOTOR_GEARSET_36, false);
+			Motor	DR4BR(11, E_MOTOR_GEARSET_36, true);
 	// Sensors
 		// Piston
 			ADIDigitalOut CLAMPY(7);
@@ -156,11 +156,39 @@ void opcontrol() {
 
 	// Special Stuff
 		// Clampy
-			CLAMPY.set_value(master.get_digital(DIGITAL_R2) - master.get_digital(DIGITAL_R1));
+			/*
+				Declareing the clampState variable to specify what state we want the clamp's piston to be in
+				We can also read this to determine what state the piston is currently in
+			*/
+			int clampState = 0;
+			/*
+				The Solinoid valve uses just a boolean 1 and 0 for opening and closing the valve
+				if the controller button R2 is pressed the piston will fire down and clamp on the MOGO
+				if button R1 is pressed the piston releases and the clamp opens
+				the variable clampState is used the in "if" statement so it doesn't fire when it already is clamped
+			*/
+			if (master.get_digital(DIGITAL_R2) && clampState == 0) {
+				clampState = 1;
+			} else if (master.get_digital(DIGITAL_R1) && clampState == 1){
+				clampState = 0;
+			}
+			// Setting the state to either high or low for the piston to fire or retract
+			CLAMPY.set_value(clampState);
+
 		// Lifting
-			double liftpwr = 127 * (master.get_digital(DIGITAL_R2) - master.get_digital(DIGITAL_R1));
-			DR4BL.move(liftpwr);
-			DR4BR.move(liftpwr);
+			/*
+				Declared variable for lifting the DR4B
+			  127 is because the (motor).move function uses volts
+				times the boolean value of Button R1 minus R2 being 1,0, or -1
+				R1 meaning going up and R2 going down
+			*/
+			double liftPwr = 127 * (master.get_digital(DIGITAL_R1) - master.get_digital(DIGITAL_R2));
+			/*
+			Move the motors for the DR4B proportional to the variable liftPwr
+			The value can be 127 (up) 0 (Stop) or -127 (Reverse)
+			*/
+			DR4BL.move(liftPwr);
+			DR4BR.move(liftPwr);
 
 		delay(20);
 	}
