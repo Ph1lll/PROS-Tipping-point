@@ -40,6 +40,7 @@ Default:	Green 18:1 E_MOTOR_GEARSET_18
 
 // Global Variables
 	bool usercontrol = false;
+	int clampState = 0;
 
 	// PID desired
 		double desired = 0;
@@ -149,8 +150,28 @@ int drovePID() {
 
 // Autonomous code
 void autonomous() {
-Task drivePD(drovePID);
 
+	LFM.move(60);
+	LBM.move(60);
+	RFM.move(60);
+	RBM.move(60);
+	delay(1150);
+	LFM.set_brake_mode(E_MOTOR_BRAKE_COAST);
+	LBM.set_brake_mode(E_MOTOR_BRAKE_COAST);
+	RFM.set_brake_mode(E_MOTOR_BRAKE_COAST);
+	RBM.set_brake_mode(E_MOTOR_BRAKE_COAST);
+
+	CLAMPY.set_value(1);
+	delay(200);
+	LFM.move(-50);
+	LBM.move(-50);
+	RFM.move(-50);
+	RBM.move(-50);
+	delay(500);
+	LFM.set_brake_mode(E_MOTOR_BRAKE_HOLD);
+	LBM.set_brake_mode(E_MOTOR_BRAKE_HOLD);
+	RFM.set_brake_mode(E_MOTOR_BRAKE_COAST);
+	RBM.set_brake_mode(E_MOTOR_BRAKE_COAST);
 
 }
 
@@ -188,16 +209,16 @@ void opcontrol() {
 				Declareing the clampState variable to specify what state we want the clamp's piston to be in
 				We can also read this to determine what state the piston is currently in
 			*/
-			int clampState = 0;
+
 			/*
 				The Solinoid valve uses just a boolean 1 and 0 for opening and closing the valve
 				if the controller button R2 is pressed the piston will fire down and clamp on the MOGO
 				if button R1 is pressed the piston releases and the clamp opens
 				the variable clampState is used the in "if" statement so it doesn't fire when it already is clamped
 			*/
-			if (master.get_digital(DIGITAL_R2) && clampState == 0) {
+			if (master.get_digital(DIGITAL_L2) && clampState == 0) {
 				clampState = 1;
-			} else if (master.get_digital(DIGITAL_R1) && clampState == 1){
+			} else if (master.get_digital(DIGITAL_L1) && clampState == 1){
 				clampState = 0;
 			}
 			// Setting the state to either high or low for the piston to fire or retract
