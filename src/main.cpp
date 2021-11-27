@@ -20,10 +20,10 @@ Default:	Green 18:1 E_MOTOR_GEARSET_18
 					Red   36:1 E_MOTOR_GEARSET_36
 				And if it's reversed
 			*/
-			Motor	LBM(4 , E_MOTOR_GEARSET_18 , true);
-			Motor	LFM(8, E_MOTOR_GEARSET_18, true);
-			Motor RFM(7, E_MOTOR_GEARSET_18, false);
-			Motor RBM(5, E_MOTOR_GEARSET_18, false);
+			Motor	LBM(11, E_MOTOR_GEARSET_18 , false);
+			Motor	LFM(2, E_MOTOR_GEARSET_18, false);
+			Motor RFM(1, E_MOTOR_GEARSET_18, true);
+			Motor RBM(12, E_MOTOR_GEARSET_18, true);
 			Motor DR4BL(6, E_MOTOR_GEARSET_36, false);
 			Motor	DR4BR(11, E_MOTOR_GEARSET_36, true);
 	// Piston
