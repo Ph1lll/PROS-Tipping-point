@@ -228,7 +228,10 @@ void opcontrol() {
 			CLAMPY.set_value(clampState);
 
 		// Lifting
-
+			/* 
+				If the position of any of the motors is lower than 0
+				then the motors of the lift don't go any lower			  
+			*/
 			int is_zero;
 			if (DR4BL.get_position() > 2 || DR4BR.get_position() > 2) {
 				is_zero = 0;
@@ -237,7 +240,7 @@ void opcontrol() {
 			}
 			/*
 				Declared variable for lifting the DR4B
-			  127 is because the (motor).move function uses volts
+				127 is because the (motor).move function uses volts
 				times the boolean value of Button R1 minus R2 being 1,0, or -1
 				R1 meaning going up and R2 going down
 			*/
