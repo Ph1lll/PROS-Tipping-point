@@ -20,12 +20,12 @@ Default:	Green 18:1 E_MOTOR_GEARSET_18
 					Red   36:1 E_MOTOR_GEARSET_36
 				And if it's reversed
 			*/
-			Motor	LBM(11, E_MOTOR_GEARSET_18 , false);
-			Motor	LFM(2, E_MOTOR_GEARSET_18, false);
+			Motor LBM(11, E_MOTOR_GEARSET_18 , false);
+			Motor LFM(2, E_MOTOR_GEARSET_18, false);
 			Motor RFM(1, E_MOTOR_GEARSET_18, true);
 			Motor RBM(12, E_MOTOR_GEARSET_18, true);
 			Motor DR4BL(6, E_MOTOR_GEARSET_36, false);
-			Motor	DR4BR(11, E_MOTOR_GEARSET_36, true);
+			Motor DR4BR(11, E_MOTOR_GEARSET_36, true);
 	// Piston
 		/*
 			ADI is for the tri port
@@ -68,6 +68,9 @@ void initialize() {
 	lcd::set_text(1, "Hello PROS User!");
 
 	lcd::register_btn1_cb(on_center_button);
+
+	DR4BL.tare_position();
+	DR4BR.tare_position();
 
 }
 
@@ -138,7 +141,7 @@ int drovePID() {
       double electron = (terror * tkP) + (tPrevError * tkI) + (teriv * tkD);
 
     // Motor Asignment
-			LBM.move_velocity(proton + electron);
+	  LBM.move_velocity(proton + electron);
       LFM.move_velocity(proton + electron);
       RBM.move_velocity(proton - electron);
       RFM.move_velocity(proton - electron);
@@ -225,13 +228,20 @@ void opcontrol() {
 			CLAMPY.set_value(clampState);
 
 		// Lifting
+
+			int is_zero;
+			if (DR4BL.get_position() > 2 || DR4BR.get_position() > 2) {
+				is_zero = 0;
+			} else {
+				is_zero = 1;
+			}
 			/*
 				Declared variable for lifting the DR4B
 			  127 is because the (motor).move function uses volts
 				times the boolean value of Button R1 minus R2 being 1,0, or -1
 				R1 meaning going up and R2 going down
 			*/
-			double liftPwr = 127 * (master.get_digital(DIGITAL_R1) - master.get_digital(DIGITAL_R2));
+			double liftPwr = 127 * (master.get_digital(DIGITAL_R1) - (master.get_digital(DIGITAL_R2) * is_zero));
 			/*
 			Move the motors for the DR4B proportional to the variable liftPwr
 			The value can be 127 (up) 0 (Stop) or -127 (Reverse)
