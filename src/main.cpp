@@ -37,6 +37,8 @@ Default:	Green 18:1 E_MOTOR_GEARSET_18
 			ADIEncoder LYEN(1, 2, false);
 			ADIEncoder RYEN(3, 4, false);
 			ADIEncoder XEN(5, 6, false);
+		// Lift Bumper
+			ADIDigitalIn LIFTO(8); 
 
 // Global Variables
 	bool usercontrol = false;
@@ -68,9 +70,6 @@ void initialize() {
 	lcd::set_text(1, "Hello PROS User!");
 
 	lcd::register_btn1_cb(on_center_button);
-
-	DR4BL.tare_position();
-	DR4BR.tare_position();
 
 }
 
@@ -226,25 +225,14 @@ void opcontrol() {
 			}
 			// Setting the state to either high or low for the piston to fire or retract
 			CLAMPY.set_value(clampState);
-
 		// Lifting
-			/* 
-				If the position of any of the motors is lower than 0
-				then the motors of the lift don't go any lower			  
-			*/
-			int is_zero;
-			if (DR4BL.get_position() > 2 || DR4BR.get_position() > 2) {
-				is_zero = 0;
-			} else {
-				is_zero = 1;
-			}
 			/*
 				Declared variable for lifting the DR4B
 				127 is because the (motor).move function uses volts
 				times the boolean value of Button R1 minus R2 being 1,0, or -1
 				R1 meaning going up and R2 going down
 			*/
-			double liftPwr = 127 * (master.get_digital(DIGITAL_R1) - (master.get_digital(DIGITAL_R2) * is_zero));
+			double liftPwr = 127 * (master.get_digital(DIGITAL_R1) - master.get_digital(DIGITAL_R2));
 			/*
 			Move the motors for the DR4B proportional to the variable liftPwr
 			The value can be 127 (up) 0 (Stop) or -127 (Reverse)
