@@ -40,6 +40,10 @@ Default:	Green 18:1 E_MOTOR_GEARSET_18
 			ADIDigitalIn LIFTO(8);
 // Global Variables
 	bool usercontrol = false;
+	/*
+		Declareing the clampState variable to specify what state we want the clamp's piston to be in
+		We can also read this to determine what state the piston is currently in
+	*/
 	int clampState = 0;
 
 	// PID desired
@@ -63,11 +67,68 @@ void on_center_button() {
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
+
+// Control for the lift
+void liftCtrl() {
+	while(1) {
+		// Lifting
+			/*
+				This is to check if the robot's lift is at the bottom
+				If it is, then the robot's wont go any lower
+			*/
+			int liftBtm;
+			if (LIFTO.get_value() == 1) {
+				liftBtm = 0;
+			} else if (LIFTO.get_value() == 0) {
+				liftBtm = 1;
+			}
+			/*
+				Declared variable for lifting the DR4B
+				127 is because the (motor).move function uses volts
+				times the boolean value of Button R1 minus R2 being 1,0, or -1
+				R1 meaning going up and R2 going down
+			*/
+			double liftPwr = 127 * (master.get_digital(DIGITAL_R1) - (master.get_digital(DIGITAL_R2)* liftBtm));
+			/*
+			Move the motors for the DR4B proportional to the variable liftPwr
+			The value can be 127 (up) 0 (Stop) or -127 (Reverse)
+			*/
+			DR4BL.move(liftPwr);
+			DR4BR.move(liftPwr);
+		delay(20);
+	}
+}
+
+// Control for the clamp
+void clampCtrl() {
+	while (1) {
+		/*
+			The Solinoid valve uses just a boolean 1 and 0 for opening and closing the valve
+			if the controller button R2 is pressed the piston will fire down and clamp on the MOGO
+			if button R1 is pressed the piston releases and the clamp opens
+			the variable clampState is used the in "if" statement so it doesn't fire when it already is clamped
+		*/
+		if (master.get_digital(DIGITAL_L2) && clampState == 0) {
+			clampState = 1;
+		} else if (master.get_digital(DIGITAL_L1) && clampState == 1){
+			clampState = 0;
+		}
+
+		// Setting the state to either high or low for the piston to fire or retract
+		CLAMPY.set_value(clampState);
+	delay(20);
+	}
+}
+
+
 void initialize() {
 	lcd::initialize();
 	lcd::set_text(1, "Hello PROS User!");
 
 	lcd::register_btn1_cb(on_center_button);
+
+	Task liftControl(liftCtrl);
+	Task clampControl(clampCtrl);
 
 }
 
@@ -201,48 +262,6 @@ void opcontrol() {
 			LFM.move(mPwr + turn);
 			RBM.move(mPwr - turn);
 			RFM.move(mPwr - turn);
-
-	// Special Stuff
-		// Clampy
-			/*
-				Declareing the clampState variable to specify what state we want the clamp's piston to be in
-				We can also read this to determine what state the piston is currently in
-			*/
-
-			/*
-				The Solinoid valve uses just a boolean 1 and 0 for opening and closing the valve
-				if the controller button R2 is pressed the piston will fire down and clamp on the MOGO
-				if button R1 is pressed the piston releases and the clamp opens
-				the variable clampState is used the in "if" statement so it doesn't fire when it already is clamped
-			*/
-			if (master.get_digital(DIGITAL_L2) && clampState == 0) {
-				clampState = 1;
-			} else if (master.get_digital(DIGITAL_L1) && clampState == 1){
-				clampState = 0;
-			}
-			// Setting the state to either high or low for the piston to fire or retract
-			CLAMPY.set_value(clampState);
-		// Lifting
-			int liftBtm;
-			if (LIFTO.get_value() == 1) {
-				liftBtm = 0;
-			} else if (LIFTO.get_value() == 0) {
-				liftBtm = 1;
-			}
-			/*
-				Declared variable for lifting the DR4B
-				127 is because the (motor).move function uses volts
-				times the boolean value of Button R1 minus R2 being 1,0, or -1
-				R1 meaning going up and R2 going down
-			*/
-			double liftPwr = 127 * (master.get_digital(DIGITAL_R1) - (master.get_digital(DIGITAL_R2)* liftBtm));
-			/*
-			Move the motors for the DR4B proportional to the variable liftPwr
-			The value can be 127 (up) 0 (Stop) or -127 (Reverse)
-			*/
-			DR4BL.move(liftPwr);
-			DR4BR.move(liftPwr);
-
 		delay(20);
 	}
 }
