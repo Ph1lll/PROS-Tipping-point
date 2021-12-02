@@ -40,11 +40,13 @@ Default:	Green 18:1 E_MOTOR_GEARSET_18
 			ADIDigitalIn LIFTO(8);
 // Global Variables
 	bool usercontrol = false;
+	bool autonGo = false;
 	/*
 		Declareing the clampState variable to specify what state we want the clamp's piston to be in
 		We can also read this to determine what state the piston is currently in
 	*/
 	int clampState = 0;
+	int liftdir = 0;
 
 	// PID desired
 		double desired = 0;
@@ -70,6 +72,7 @@ void on_center_button() {
 
 // Control for the lift
 void liftCtrl() {
+	double liftPwr;
 	while(1) {
 		// Lifting
 			/*
@@ -88,7 +91,11 @@ void liftCtrl() {
 				times the boolean value of Button R1 minus R2 being 1,0, or -1
 				R1 meaning going up and R2 going down
 			*/
-			double liftPwr = 127 * (master.get_digital(DIGITAL_R1) - (master.get_digital(DIGITAL_R2)* liftBtm));
+			if (usercontrol) {
+			liftPwr = 127 * (master.get_digital(DIGITAL_R1) - (master.get_digital(DIGITAL_R2)* liftBtm));
+			} else if (autonGo) {
+			liftPwr = 127 * liftdir;	
+			}
 			/*
 			Move the motors for the DR4B proportional to the variable liftPwr
 			The value can be 127 (up) 0 (Stop) or -127 (Reverse)
@@ -108,10 +115,12 @@ void clampCtrl() {
 			if button R1 is pressed the piston releases and the clamp opens
 			the variable clampState is used the in "if" statement so it doesn't fire when it already is clamped
 		*/
-		if (master.get_digital(DIGITAL_L2) && clampState == 0) {
-			clampState = 1;
-		} else if (master.get_digital(DIGITAL_L1) && clampState == 1){
-			clampState = 0;
+		if (usercontrol) {
+			if (master.get_digital(DIGITAL_L2) && clampState == 0) {
+				clampState = 1;
+			} else if (master.get_digital(DIGITAL_L1) && clampState == 1){
+				clampState = 0;
+			}
 		}
 
 		// Setting the state to either high or low for the piston to fire or retract
@@ -210,6 +219,7 @@ int drovePID() {
 
 // Autonomous code
 void autonomous() {
+autonGo = true;
 
 	LFM.move(60);
 	LBM.move(60);
@@ -239,6 +249,7 @@ void autonomous() {
 	This is the driver control code
 */
 void opcontrol() {
+	autonGo = false;
 	usercontrol = true;
 	while (usercontrol) {
 	// Driving
