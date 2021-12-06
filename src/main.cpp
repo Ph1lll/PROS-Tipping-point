@@ -41,6 +41,7 @@ Default:	Green 18:1 E_MOTOR_GEARSET_18
 // Global Variables
 	bool usercontrol = false;
 	bool autonGo = false;
+	bool sideAuto = false;
 	/*
 		Declareing the clampState variable to specify what state we want the clamp's piston to be in
 		We can also read this to determine what state the piston is currently in
@@ -160,7 +161,25 @@ void disabled() {}
  * starts.
  */
 void competition_initialize() {
+	while (!autonGo && !usercontrol) {
+			if (master.get_digital(DIGITAL_X) && !sideAuto) {
+				sideAuto == !sideAuto;
+				delay(20);
+			} else if (master.get_digital(DIGITAL_A) && sideAuto) {
+				sideAuto == !sideAuto;
+				delay(20);
+			}
 
+			if (sideAuto) {
+				master.clear_line(0);
+				master.print(0, 0, "Auton on the Right");
+			} else if (!sideAuto) {
+				master.clear_line(0);
+				master.print(0, 0, "Auton on the Left");
+			} 
+
+		delay(30);
+	}
 }
 
 
@@ -221,27 +240,31 @@ int drovePID() {
 void autonomous() {
 autonGo = true;
 
-	LFM.move(60);
-	LBM.move(60);
-	RFM.move(60);
-	RBM.move(60);
-	delay(1150);
-	LFM.set_brake_mode(E_MOTOR_BRAKE_COAST);
-	LBM.set_brake_mode(E_MOTOR_BRAKE_COAST);
-	RFM.set_brake_mode(E_MOTOR_BRAKE_COAST);
-	RBM.set_brake_mode(E_MOTOR_BRAKE_COAST);
-
-	CLAMPY.set_value(1);
-	delay(200);
-	LFM.move(-50);
-	LBM.move(-50);
-	RFM.move(-50);
-	RBM.move(-50);
-	delay(500);
-	LFM.set_brake_mode(E_MOTOR_BRAKE_HOLD);
-	LBM.set_brake_mode(E_MOTOR_BRAKE_HOLD);
-	RFM.set_brake_mode(E_MOTOR_BRAKE_COAST);
-	RBM.set_brake_mode(E_MOTOR_BRAKE_COAST);
+if (sideAuto) {
+	LFM.move(70);
+	LBM.move(70);
+	RFM.move(70);
+	RBM.move(70);
+	delay(900);
+	LFM.move(0);
+	LBM.move(0);
+	RFM.move(0);
+	RBM.move(0);
+	clampState = 1;
+	delay(100);
+	LFM.move(-70);
+	LBM.move(-70);
+	RFM.move(-70);
+	RBM.move(-70);
+	delay(750);
+	LFM.move(0);
+	LBM.move(0);
+	RFM.move(0);
+	RBM.move(0);
+	clampState = 0;
+	} else if (!sideAuto) {
+	master.print(0, 0, "There's nothing here Phillip didn't code that shit");
+	}
 
 }
 
