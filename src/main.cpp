@@ -16,28 +16,28 @@
 				Declareing what port the motor is
 				What gearset the motor uses
 					Blue  6:1  E_MOTOR_GEARSET_06
-Default:	Green 18:1 E_MOTOR_GEARSET_18
+		Default:	Green 18:1 E_MOTOR_GEARSET_18
 					Red   36:1 E_MOTOR_GEARSET_36
 				And if it's reversed
 			*/
-			Motor LBM(13, E_MOTOR_GEARSET_18 , false);
+			Motor LBM(3, E_MOTOR_GEARSET_18 , false);
 			Motor LFM(2, E_MOTOR_GEARSET_18, false);
-			Motor RFM(1, E_MOTOR_GEARSET_18, true);
-			Motor RBM(12, E_MOTOR_GEARSET_18, true);
-			Motor DR4BL(19, E_MOTOR_GEARSET_36, false);
-			Motor DR4BR(20, E_MOTOR_GEARSET_36, true);
-	// Piston
-		/*
-			ADI is for the tri port
-			CLAMPY is the piston for the front clamp
-		*/
-		ADIDigitalOut CLAMPY(7);
-	// Sensors
+			Motor RFM(10, E_MOTOR_GEARSET_18, true);
+			Motor RBM(1, E_MOTOR_GEARSET_18, true);
+			Motor DR4BL(18, E_MOTOR_GEARSET_36, false);
+			Motor DR4BR(19, E_MOTOR_GEARSET_36, true);
+		// Distance
+			Distance LIFTO(20);
+	// Tri port
+		// Piston
+			/*
+				ADI is for the tri port
+				CLAMPY is the piston for the front clamp
+			*/
+			ADIDigitalOut CLAMPY(7);
 		// Encoders
 			ADIEncoder LYEN(1, 2, false);
 			ADIEncoder RYEN(3, 4, false);
-		// Limit Switch
-			ADIDigitalIn LIFTO(8);
 // Global Variables
 	bool usercontrol = false;
 	bool autonGo = false;
@@ -81,9 +81,9 @@ void liftCtrl() {
 				If it is, then the robot's wont go any lower
 			*/
 			int liftBtm;
-			if (LIFTO.get_value() == 1) {
+			if (LIFTO.get() <= 30) {
 				liftBtm = 0;
-			} else if (LIFTO.get_value() == 0) {
+			} else if (LIFTO.get() >= 30) {
 				liftBtm = 1;
 			}
 			/*
@@ -180,6 +180,12 @@ void competition_initialize() {
 
 		delay(30);
 	}
+
+	while (LIFTO.get() >= 30) {
+		DR4BL.move(-100);
+		DR4BR.move(-100);
+		delay(30);
+	}
 }
 
 
@@ -188,9 +194,8 @@ void competition_initialize() {
 int drovePID() {
 
 	// Encoders
-		//
-			double yPos = LYEN.get_value() + RYEN.get_value();
-			double tspoon  = LYEN.get_value() - RYEN.get_value();
+		double yPos = LYEN.get_value() + RYEN.get_value();
+		double tspoon  = LYEN.get_value() - RYEN.get_value();
 	// PID system
     // Position
       double error = 0;
@@ -257,11 +262,39 @@ if (sideAuto) {
 	RFM.move(-70);
 	RBM.move(-70);
 	delay(750);
+	LFM.move(-60);
+	LBM.move(-60);
+	RFM.move(60);
+	RBM.move(60);
+	delay(450);
+	LFM.move(60);
+	LBM.move(60);
+	RFM.move(-60);
+	RBM.move(-60);
+	clampState = 0;
+	delay(100);
+	LFM.move(80);
+	LBM.move(80);
+	RFM.move(80);
+	RBM.move(80);
+	delay(1000);
+	LFM.move(0);
+	LBM.move(0);
+	RFM.move(0);
+	RBM.move(0);
+	clampState = 1;
+	delay(100);
+	LFM.move(-70);
+	LBM.move(-70);
+	RFM.move(-70);
+	RBM.move(-70);
+	delay(750);
 	LFM.move(0);
 	LBM.move(0);
 	RFM.move(0);
 	RBM.move(0);
 	clampState = 0;
+	
 	} else if (!sideAuto) {
 	master.print(0, 0, "There's nothing here Phillip didn't code that shit");
 	}
