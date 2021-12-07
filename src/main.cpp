@@ -41,7 +41,7 @@
 // Global Variables
 	bool usercontrol = false;
 	bool autonGo = false;
-	bool sideAuto = true;
+	bool sideAuto = false;
 	/*
 		Declareing the clampState variable to specify what state we want the clamp's piston to be in
 		We can also read this to determine what state the piston is currently in
@@ -119,8 +119,10 @@ void clampCtrl() {
 		if (usercontrol) {
 			if (master.get_digital(DIGITAL_L2) && clampState == 0) {
 				clampState = 1;
+				delay(30);
 			} else if (master.get_digital(DIGITAL_L1) && clampState == 1){
 				clampState = 0;
+				delay(30);
 			}
 		}
 
@@ -247,74 +249,44 @@ autonGo = true;
 
 if (sideAuto) {
 
-	LFM.move(70);
-	LBM.move(70);
-	RFM.move(70);
-	RBM.move(70);
-	delay(900);
+	LFM.move(90);
+	LBM.move(90);
+	RFM.move(90);
+	RBM.move(90);
+	delay(3250);
 	LFM.move(0);
 	LBM.move(0);
 	RFM.move(0);
 	RBM.move(0);
 	clampState = 1;
-
 	delay(100);
-	DR4BL.move_absolute(360, 100);
-	DR4BL.move_absolute(360, 100);
-	delay(50);
-
 	LFM.move(-70);
 	LBM.move(-70);
 	RFM.move(-70);
 	RBM.move(-70);
+	delay(3350);
+	clampState = 0;
+	LFM.move(70);
+	LBM.move(70);
+	RFM.move(-70);
+	RBM.move(-70);
+	delay(1600);
+	LFM.move(70);
+	LBM.move(70);
+	RFM.move(70);
+	RBM.move(70);
 	delay(500);
 	LFM.move(0);
 	LBM.move(0);
 	RFM.move(0);
 	RBM.move(0);
-	delay(50);
-
-	LFM.move(-100);
-	LBM.move(-100);
-	RFM.move(100);
-	RBM.move(100);
-	delay(1100);
-	LFM.move(50);
-	LBM.move(50);
-	RFM.move(50);
-	RBM.move(50);
-	clampState = 0;
-	delay(50);
-	DR4BL.move_absolute(-360, 100);
-	DR4BL.move_absolute(-360, 100);
-	delay(50);
-	LFM.move(0);
-	LBM.move(0);
-	RFM.move(0);
-	RBM.move(0);
-
-	LFM.move(90);
-	LBM.move(90);
-	RFM.move(-90);
-	RBM.move(-90);
-	delay(575);
-
-	LFM.move(90);
-	LBM.move(90);
-	RFM.move(90);
-	RBM.move(90);
-	delay(3500);
-	LFM.move(0);
-	LBM.move(0);
-	RFM.move(0);
-	RBM.move(0);
 	clampState = 1;
-	delay(100);
+	delay(50);
 	LFM.move(-70);
 	LBM.move(-70);
 	RFM.move(-70);
 	RBM.move(-70);
-	delay(900);
+	delay(850);
 	LFM.move(0);
 	LBM.move(0);
 	RFM.move(0);
@@ -322,7 +294,50 @@ if (sideAuto) {
 	clampState = 0;
 	
 	} else if (!sideAuto) {
-	master.print(0, 0, "There's nothing here Phillip didn't code that shit");
+	
+	LFM.move(127);
+	LBM.move(127);
+	RFM.move(127);
+	RBM.move(127);
+	delay(1800);
+	LFM.move(0);
+	LBM.move(0);
+	RFM.move(0);
+	RBM.move(0);
+	clampState = 1;
+	delay(100);
+	LFM.move(-90);
+	LBM.move(-90);
+	RFM.move(-90);
+	RBM.move(-90);
+	delay(2400);
+	clampState = 0;
+	LFM.move(70);
+	LBM.move(70);
+	RFM.move(-70);
+	RBM.move(-70);
+	delay(1350);
+	LFM.move(70);
+	LBM.move(70);
+	RFM.move(70);
+	RBM.move(70);
+	delay(500);
+	LFM.move(0);
+	LBM.move(0);
+	RFM.move(0);
+	RBM.move(0);
+	clampState = 1;
+	delay(50);
+	LFM.move(-70);
+	LBM.move(-70);
+	RFM.move(-70);
+	RBM.move(-70);
+	delay(750);
+	LFM.move(0);
+	LBM.move(0);
+	RFM.move(0);
+	RBM.move(0);
+	clampState = 0;
 	}
 
 }
