@@ -41,7 +41,7 @@
 // Global Variables
 	bool usercontrol = false;
 	bool autonGo = false;
-	bool sideAuto = false;
+	bool sideAuto = true;
 	/*
 		Declareing the clampState variable to specify what state we want the clamp's piston to be in
 		We can also read this to determine what state the piston is currently in
@@ -246,6 +246,7 @@ void autonomous() {
 autonGo = true;
 
 if (sideAuto) {
+
 	LFM.move(70);
 	LBM.move(70);
 	RFM.move(70);
@@ -256,28 +257,53 @@ if (sideAuto) {
 	RFM.move(0);
 	RBM.move(0);
 	clampState = 1;
+
 	delay(100);
+	DR4BL.move_absolute(360, 100);
+	DR4BL.move_absolute(360, 100);
+	delay(50);
+
 	LFM.move(-70);
 	LBM.move(-70);
 	RFM.move(-70);
 	RBM.move(-70);
-	delay(750);
-	LFM.move(-60);
-	LBM.move(-60);
-	RFM.move(60);
-	RBM.move(60);
-	delay(450);
-	LFM.move(60);
-	LBM.move(60);
-	RFM.move(-60);
-	RBM.move(-60);
+	delay(500);
+	LFM.move(0);
+	LBM.move(0);
+	RFM.move(0);
+	RBM.move(0);
+	delay(50);
+
+	LFM.move(-100);
+	LBM.move(-100);
+	RFM.move(100);
+	RBM.move(100);
+	delay(1100);
+	LFM.move(50);
+	LBM.move(50);
+	RFM.move(50);
+	RBM.move(50);
 	clampState = 0;
-	delay(100);
-	LFM.move(80);
-	LBM.move(80);
-	RFM.move(80);
-	RBM.move(80);
-	delay(1000);
+	delay(50);
+	DR4BL.move_absolute(-360, 100);
+	DR4BL.move_absolute(-360, 100);
+	delay(50);
+	LFM.move(0);
+	LBM.move(0);
+	RFM.move(0);
+	RBM.move(0);
+
+	LFM.move(90);
+	LBM.move(90);
+	RFM.move(-90);
+	RBM.move(-90);
+	delay(575);
+
+	LFM.move(90);
+	LBM.move(90);
+	RFM.move(90);
+	RBM.move(90);
+	delay(3500);
 	LFM.move(0);
 	LBM.move(0);
 	RFM.move(0);
@@ -288,7 +314,7 @@ if (sideAuto) {
 	LBM.move(-70);
 	RFM.move(-70);
 	RBM.move(-70);
-	delay(750);
+	delay(900);
 	LFM.move(0);
 	LBM.move(0);
 	RFM.move(0);
