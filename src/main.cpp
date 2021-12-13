@@ -81,9 +81,9 @@ void liftCtrl() {
 				If it is, then the robot's wont go any lower
 			*/
 			int liftBtm;
-			if (LIFTO.get() <= 30) {
+			if (LIFTO.get() <= 30 ) {
 				liftBtm = 0;
-			} else if (LIFTO.get() >= 30) {
+			} else if (LIFTO.get() >= 55) {
 				liftBtm = 1;
 			}
 			/*
@@ -151,7 +151,28 @@ void initialize() {
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
-void disabled() {}
+void disabled() {
+	while (!autonGo && !usercontrol) {
+			if (master.get_digital(DIGITAL_X) && !sideAuto) {
+				sideAuto == !sideAuto;
+				delay(20);
+			} else if (master.get_digital(DIGITAL_A) && sideAuto) {
+				sideAuto == !sideAuto;
+				delay(20);
+			}
+
+			if (sideAuto) {
+				master.clear_line(0);
+				master.print(0, 0, "Auton on the Right");
+			} else if (!sideAuto) {
+				master.clear_line(0);
+				master.print(0, 0, "Auton on the Left");
+			} 
+
+		delay(30);
+	}
+
+}
 
 /*
  * Runs after initialize(), and before autonomous when connected to the Field
@@ -183,7 +204,7 @@ void competition_initialize() {
 		delay(30);
 	}
 
-	while (LIFTO.get() >= 30) {
+	while (LIFTO.get() >= 50) {
 		DR4BL.move(-100);
 		DR4BR.move(-100);
 		delay(30);
@@ -249,22 +270,22 @@ autonGo = true;
 
 if (sideAuto) {
 
-	LFM.move(90);
-	LBM.move(90);
-	RFM.move(90);
-	RBM.move(90);
-	delay(3250);
+	LFM.move(127);
+	LBM.move(127);
+	RFM.move(127);
+	RBM.move(127);
+	delay(2400);
 	LFM.move(0);
 	LBM.move(0);
 	RFM.move(0);
 	RBM.move(0);
 	clampState = 1;
 	delay(100);
-	LFM.move(-70);
-	LBM.move(-70);
-	RFM.move(-70);
-	RBM.move(-70);
-	delay(3350);
+	LFM.move(-90);
+	LBM.move(-90);
+	RFM.move(-90);
+	RBM.move(-90);
+	delay(3000);
 	clampState = 0;
 	LFM.move(70);
 	LBM.move(70);
@@ -275,23 +296,16 @@ if (sideAuto) {
 	LBM.move(70);
 	RFM.move(70);
 	RBM.move(70);
-	delay(500);
-	LFM.move(0);
-	LBM.move(0);
-	RFM.move(0);
-	RBM.move(0);
-	clampState = 1;
-	delay(50);
+	delay(750);
 	LFM.move(-70);
 	LBM.move(-70);
 	RFM.move(-70);
 	RBM.move(-70);
-	delay(850);
+	delay(350);
 	LFM.move(0);
 	LBM.move(0);
 	RFM.move(0);
 	RBM.move(0);
-	clampState = 0;
 	
 	} else if (!sideAuto) {
 	
@@ -310,18 +324,18 @@ if (sideAuto) {
 	LBM.move(-90);
 	RFM.move(-90);
 	RBM.move(-90);
-	delay(2400);
+	delay(2500);
 	clampState = 0;
 	LFM.move(70);
 	LBM.move(70);
 	RFM.move(-70);
 	RBM.move(-70);
-	delay(1350);
+	delay(1600);
 	LFM.move(70);
 	LBM.move(70);
 	RFM.move(70);
 	RBM.move(70);
-	delay(500);
+	delay(660);
 	LFM.move(0);
 	LBM.move(0);
 	RFM.move(0);
