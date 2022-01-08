@@ -2,9 +2,6 @@
 
 #include "main.h"
 
-// Global Variables
-	int liftdir = 0;
-
 // LLEMU's center button
 void on_center_button() {
 	static bool pressed = false;
@@ -17,59 +14,6 @@ void on_center_button() {
 }
 
 // Control for the lift
-void liftCtrl() {
-	double liftPwr;
-	while(1) {
-		// Check if the lift bottomed out
-		int liftBtm;
-		if (LIFTO.get() <= 30 ) {
-			liftBtm = 0;
-		} else if (LIFTO.get() >= 55) {
-			liftBtm = 1;
-		}
-
-		// Controlling the motors
-		if (usercontrol) {
-		liftPwr = 127 * (master.get_digital(DIGITAL_R1) - (master.get_digital(DIGITAL_R2)* liftBtm));
-		} else if (autonGo) {
-		liftPwr = 70 * liftdir;	
-		}
-		
-		// Lift Motors
-		DR4BL.move(liftPwr);
-		DR4BR.move(liftPwr);
-		delay(20);
-	}
-}
-
-// Control for the clamp
-void clampCtrl() {
-	while (1) {
-		// User control
-		if (usercontrol) {
-
-			bool psshhh;
-			// Preventing the piston to basically waste the air
-			if (master.get_digital(DIGITAL_L2) && master.get_digital(DIGITAL_L1)) {
-				psshhh = true;
-			} else {
-				psshhh = false;
-			}
-			
-			// User control
-			if (master.get_digital(DIGITAL_L2) && clampState == 0 && !psshhh) {
-				clampState = 1;
-			} else if (master.get_digital(DIGITAL_L1) && clampState == 1 && !psshhh){
-				clampState = 0;
-			}
-		}
-
-		CLAMPY.set_value(clampState);
-	delay(20);
-	}
-}
-
-
 // Automatically do some preperations before the match starts
 void compReady() {
 	while (!autonGo && !usercontrol) {
@@ -130,15 +74,6 @@ void initialize() {
 	compReady();
 
 }
-
-void disabled() {
-
-}
-
-void competition_initialize() {
-}
-
-
 
 // Autonomous code
 void autonomous() {

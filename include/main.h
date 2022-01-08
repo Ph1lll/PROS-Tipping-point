@@ -71,6 +71,7 @@ void competition_initialize(void);
 void opcontrol(void);
 void autonmo(void);
 void clampCtrl(void);
+void liftCtrl(void);
 void drivePID(void);
 #ifdef __cplusplus
 }
@@ -94,4 +95,5 @@ bool sideAuto = false;
 // PID desired
 double desired = 0;
 double tesired = 0;
+int liftdir = 0;
 

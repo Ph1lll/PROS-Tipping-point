@@ -6,7 +6,6 @@ void autonmo() {
 // Task myTask(drivePID);
 
     if (sideAuto) {
-
 		LBM.move(127);
 		LFM.move(127);
 		RFM.move(127);
