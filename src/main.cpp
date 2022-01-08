@@ -8,16 +8,13 @@
 	bool usercontrol = false;
 	bool autonGo = false;
 	bool sideAuto = false;
-	/*
-		Declareing the clampState variable to specify what state we want the clamp's piston to be in
-		We can also read this to determine what state the piston is currently in
-	*/
 	int clampState = 0;
 	int liftdir = 0;
 
 	// PID desired
-		double desired = 0;
-		double tesired = 0;
+	double desired = 0;
+	double tesired = 0;
+
 
 // LLEMU's center button
 void on_center_button() {
@@ -34,25 +31,24 @@ void on_center_button() {
 void liftCtrl() {
 	double liftPwr;
 	while(1) {
-		// Lifting
-			// Check if the lift bottomed out
-			int liftBtm;
-			if (LIFTO.get() <= 30 ) {
-				liftBtm = 0;
-			} else if (LIFTO.get() >= 55) {
-				liftBtm = 1;
-			}
+		// Check if the lift bottomed out
+		int liftBtm;
+		if (LIFTO.get() <= 30 ) {
+			liftBtm = 0;
+		} else if (LIFTO.get() >= 55) {
+			liftBtm = 1;
+		}
 
-			// Controlling the motors
-			if (usercontrol) {
-			liftPwr = 127 * (master.get_digital(DIGITAL_R1) - (master.get_digital(DIGITAL_R2)* liftBtm));
-			} else if (autonGo) {
-			liftPwr = 70 * liftdir;	
-			}
-			
-			// Lift Motors
-			DR4BL.move(liftPwr);
-			DR4BR.move(liftPwr);
+		// Controlling the motors
+		if (usercontrol) {
+		liftPwr = 127 * (master.get_digital(DIGITAL_R1) - (master.get_digital(DIGITAL_R2)* liftBtm));
+		} else if (autonGo) {
+		liftPwr = 70 * liftdir;	
+		}
+		
+		// Lift Motors
+		DR4BL.move(liftPwr);
+		DR4BR.move(liftPwr);
 		delay(20);
 	}
 }
@@ -60,23 +56,25 @@ void liftCtrl() {
 // Control for the clamp
 void clampCtrl() {
 	while (1) {
-		/*
-			The Solinoid valve uses just a boolean 1 and 0 for opening and closing the valve
-			if the controller button R2 is pressed the piston will fire down and clamp on the MOGO
-			if button R1 is pressed the piston releases and the clamp opens
-			the variable clampState is used the in "if" statement so it doesn't fire when it already is clamped
-		*/
+		// User control
 		if (usercontrol) {
-			if (master.get_digital(DIGITAL_L2) && clampState == 0) {
+
+			bool psshhh;
+			// Preventing the piston to basically waste the air
+			if (master.get_digital(DIGITAL_L2) && master.get_digital(DIGITAL_L1)) {
+				psshhh = true;
+			} else {
+				psshhh = false;
+			}
+			
+			// User control
+			if (master.get_digital(DIGITAL_L2) && clampState == 0 && !psshhh) {
 				clampState = 1;
-				delay(30);
-			} else if (master.get_digital(DIGITAL_L1) && clampState == 1){
+			} else if (master.get_digital(DIGITAL_L1) && clampState == 1 && !psshhh){
 				clampState = 0;
-				delay(30);
 			}
 		}
 
-		// Setting the state to either high or low for the piston to fire or retract
 		CLAMPY.set_value(clampState);
 	delay(20);
 	}
