@@ -35,6 +35,7 @@
 #define PROS_USE_LITERALS
 
 #include "api.h"
+#include "asignment.hpp"
 
 /**
  * You should add more #includes here
@@ -68,6 +69,9 @@ void initialize(void);
 void disabled(void);
 void competition_initialize(void);
 void opcontrol(void);
+void autonmo(void);
+void clampCtrl(void);
+void drivePID(void);
 #ifdef __cplusplus
 }
 #endif
@@ -80,3 +84,14 @@ void opcontrol(void);
 #endif
 
 #endif  // _PROS_MAIN_H_
+
+// Global Variables
+
+bool usercontrol = false;
+bool autonGo = false;
+bool sideAuto = false;
+
+// PID desired
+double desired = 0;
+double tesired = 0;
+
