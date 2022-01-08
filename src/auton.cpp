@@ -1,6 +1,6 @@
 #include "main.h"
+#include "asignment.h"
 
-int liftdir = 0;
 
 void autonmo() {
 // Task myTask(drivePID);

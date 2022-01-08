@@ -17,8 +17,6 @@
 /// Tri port
 	// Piston
 	ADIDigitalOut CLAMPY(7);
-		// Clampstate
-		int clampState = 0;
 	// Encoders
 	ADIEncoder LYEN(1, 2, false);
 	ADIEncoder RYEN(3, 4, false);
