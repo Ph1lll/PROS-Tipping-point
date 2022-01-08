@@ -30,43 +30,27 @@ void on_center_button() {
 	}
 }
 
-/*
- * Runs initialization code. This occurs as soon as the program is started.
- *
- * All other competition modes are blocked by initialize; it is recommended
- * to keep execution time for this mode under a few seconds.
- */
-
 // Control for the lift
 void liftCtrl() {
 	double liftPwr;
 	while(1) {
 		// Lifting
-			/*
-				This is to check if the robot's lift is at the bottom
-				If it is, then the robot's wont go any lower
-			*/
+			// Check if the lift bottomed out
 			int liftBtm;
 			if (LIFTO.get() <= 30 ) {
 				liftBtm = 0;
 			} else if (LIFTO.get() >= 55) {
 				liftBtm = 1;
 			}
-			/*
-				Declared variable for lifting the DR4B
-				127 is because the (motor).move function uses volts
-				times the boolean value of Button R1 minus R2 being 1,0, or -1
-				R1 meaning going up and R2 going down
-			*/
+
+			// Controlling the motors
 			if (usercontrol) {
 			liftPwr = 127 * (master.get_digital(DIGITAL_R1) - (master.get_digital(DIGITAL_R2)* liftBtm));
 			} else if (autonGo) {
-			liftPwr = 127 * liftdir;	
+			liftPwr = 70 * liftdir;	
 			}
-			/*
-			Move the motors for the DR4B proportional to the variable liftPwr
-			The value can be 127 (up) 0 (Stop) or -127 (Reverse)
-			*/
+			
+			// Lift Motors
 			DR4BL.move(liftPwr);
 			DR4BR.move(liftPwr);
 		delay(20);
@@ -99,257 +83,231 @@ void clampCtrl() {
 }
 
 
-void initialize() {
-	lcd::initialize();
-	lcd::set_text(1, "Hello PROS User!");
+// Automatically do some preperations before the match starts
+void compReady() {
+	while (!autonGo && !usercontrol) {
 
+		// Controlling what side we want auton to go 
+		if (master.get_digital(DIGITAL_X) && !sideAuto) {
+			sideAuto == !sideAuto;
+			delay(20);
+		} else if (master.get_digital(DIGITAL_A) && sideAuto) {
+			sideAuto == !sideAuto;
+			delay(20);
+		}
+
+		// Telling the user what side of auton we're using
+		if (sideAuto) {
+			master.clear_line(0);
+			master.print(0, 0, "Auton on the Right");
+		} else if (!sideAuto) {
+			master.clear_line(0);
+			master.print(0, 0, "Auton on the Left");
+		} 
+
+		bool readyClamp = false;
+		// Check if we have pumped up the canisters for the clamp
+		while (!readyClamp) {
+			master.clear_line(0);
+			master.print(0, 0, "Have you pumped the canisters?");
+			if (master.get_digital(DIGITAL_A)) readyClamp = true;
+		}
+		
+
+		delay(30);
+	}
+
+	bool readyLift = false;
+	while (!readyLift) {
+		if (LIFTO.get() >= 50) {
+			DR4BL.move(-80);
+			DR4BR.move(-80);
+		} else if (LIFTO.get() <= 50) { 
+			readyLift = true;
+		}
+		delay(30);
+	}
+}
+
+
+void initialize() {
+
+	// LCD Welcome
+	lcd::initialize();
+	lcd::set_text(1, "Hello VEX World!");
 	lcd::register_btn1_cb(on_center_button);
 
+	// Switching on tasks
 	Task liftControl(liftCtrl);
 	Task clampControl(clampCtrl);
+	compReady();
 
 }
 
-
-
-/*
- * Runs while the robot is in the disabled state of Field Management System or
- * the VEX Competition Switch, following either autonomous or opcontrol. When
- * the robot is enabled, this task will exit.
- */
 void disabled() {
-	while (!autonGo && !usercontrol) {
-			if (master.get_digital(DIGITAL_X) && !sideAuto) {
-				sideAuto == !sideAuto;
-				delay(20);
-			} else if (master.get_digital(DIGITAL_A) && sideAuto) {
-				sideAuto == !sideAuto;
-				delay(20);
-			}
-
-			if (sideAuto) {
-				master.clear_line(0);
-				master.print(0, 0, "Auton on the Right");
-			} else if (!sideAuto) {
-				master.clear_line(0);
-				master.print(0, 0, "Auton on the Left");
-			} 
-
-		delay(30);
-	}
 
 }
 
-/*
- * Runs after initialize(), and before autonomous when connected to the Field
- * Management System or the VEX Competition Switch. This is intended for
- * competition-specific initialization routines, such as an autonomous selector
- * on the LCD.
- *
- * This task will exit when the robot is enabled and autonomous or opcontrol
- * starts.
- */
 void competition_initialize() {
-	while (!autonGo && !usercontrol) {
-			if (master.get_digital(DIGITAL_X) && !sideAuto) {
-				sideAuto == !sideAuto;
-				delay(20);
-			} else if (master.get_digital(DIGITAL_A) && sideAuto) {
-				sideAuto == !sideAuto;
-				delay(20);
-			}
-
-			if (sideAuto) {
-				master.clear_line(0);
-				master.print(0, 0, "Auton on the Right");
-			} else if (!sideAuto) {
-				master.clear_line(0);
-				master.print(0, 0, "Auton on the Left");
-			} 
-
-		delay(30);
-	}
-
-	while (LIFTO.get() >= 50) {
-		DR4BL.move(-100);
-		DR4BR.move(-100);
-		delay(30);
-	}
 }
-
-
 
 // PID system for autonomous that hopefully gets implemented
-int drovePID() {
+void drivePID() {
 
 	// Encoders
 		double yPos = LYEN.get_value() + RYEN.get_value();
 		double tspoon  = LYEN.get_value() - RYEN.get_value();
 	// PID system
     // Position
-      double error = 0;
-      double prevError = 0;
-      double deriv = 0;
+      	double error = 0;
+      	double prevError = 0;
+      	double deriv = 0;
     // Turning
-      float terror = 0;
-      float tPrevError = 0;
-      float teriv = 0;
+      	float terror = 0;
+      	float tPrevError = 0;
+      	float teriv = 0;
 
 	// Konstants
-    // Going forward
-      double kP = 0;
-      double kI = 0;
-      double kD = 0;
-    // Turning
-      double tkP = 0;
-      double tkI = 0;
-      double tkD = 0;
+    	// Going forward
+      		double kP = 0;
+      		double kI = 0;
+      		double kD = 0;
+    	// Turning
+      		double tkP = 0;
+      		double tkI = 0;
+      		double tkD = 0;
 
 	while (!usercontrol) {
 		// PID yPos
-      error = yPos - desired;
-      prevError += error;
-      deriv = error - prevError;
-    // PID Turning
-      terror = tspoon - tesired;
-      tPrevError += terror;
-      teriv = terror - tPrevError;
+      		error = yPos - desired;
+      		prevError += error;
+      		deriv = error - prevError;
+    	// PID Turning
+      		terror = tspoon - tesired;
+      		tPrevError += terror;
+      		teriv = terror - tPrevError;
 
 		// Lateral movement
-      double proton = (error * kP) + (prevError * kI) + (deriv * kD);
-      double electron = (terror * tkP) + (tPrevError * tkI) + (teriv * tkD);
+      		double proton = (error * kP) + (prevError * kI) + (deriv * kD);
+      		double electron = (terror * tkP) + (tPrevError * tkI) + (teriv * tkD);
 
-    // Motor Asignment
-	  LBM.move_velocity(proton + electron);
-      LFM.move_velocity(proton + electron);
-      RBM.move_velocity(proton - electron);
-      RFM.move_velocity(proton - electron);
+    	// Motor Asignment
+	  		LBM.move_velocity(proton + electron);
+      		LFM.move_velocity(proton + electron);
+      		RBM.move_velocity(proton - electron);
+      		RFM.move_velocity(proton - electron);
 
 			delay(20);
-		}
-	return 1;
+	}
 }
 
 // Autonomous code
 void autonomous() {
 autonGo = true;
 
-if (sideAuto) {
+	if (sideAuto) {
 
-	LFM.move(127);
-	LBM.move(127);
-	RFM.move(127);
-	RBM.move(127);
-	delay(2400);
-	LFM.move(0);
-	LBM.move(0);
-	RFM.move(0);
-	RBM.move(0);
-	clampState = 1;
-	delay(100);
-	LFM.move(-90);
-	LBM.move(-90);
-	RFM.move(-90);
-	RBM.move(-90);
-	delay(3000);
-	clampState = 0;
-	LFM.move(70);
-	LBM.move(70);
-	RFM.move(-70);
-	RBM.move(-70);
-	delay(1600);
-	LFM.move(70);
-	LBM.move(70);
-	RFM.move(70);
-	RBM.move(70);
-	delay(750);
-	LFM.move(-70);
-	LBM.move(-70);
-	RFM.move(-70);
-	RBM.move(-70);
-	delay(350);
-	LFM.move(0);
-	LBM.move(0);
-	RFM.move(0);
-	RBM.move(0);
+		LBM.move(127);
+		LFM.move(127);
+		RFM.move(127);
+		RBM.move(127);
+		delay(2400);
+		LFM.move(0);
+		LBM.move(0);
+		RFM.move(0);
+		RBM.move(0);
+		clampState = 1;
+		delay(100);
+		LFM.move(-90);
+		LBM.move(-90);
+		RFM.move(-90);
+		RBM.move(-90);
+		delay(3000);
+		clampState = 0;
+		LFM.move(70);
+		LBM.move(70);
+		RFM.move(-70);
+		RBM.move(-70);
+		delay(1600);
+		LFM.move(70);
+		LBM.move(70);
+		RFM.move(70);
+		RBM.move(70);
+		delay(750);
+		LFM.move(-70);
+		LBM.move(-70);
+		RFM.move(-70);
+		RBM.move(-70);
+		delay(350);
+		LFM.move(0);
+		LBM.move(0);
+		RFM.move(0);
+		RBM.move(0);
 	
 	} else if (!sideAuto) {
 	
-	LFM.move(127);
-	LBM.move(127);
-	RFM.move(127);
-	RBM.move(127);
-	delay(1800);
-	LFM.move(0);
-	LBM.move(0);
-	RFM.move(0);
-	RBM.move(0);
-	clampState = 1;
-	delay(100);
-	LFM.move(-90);
-	LBM.move(-90);
-	RFM.move(-90);
-	RBM.move(-90);
-	delay(2500);
-	clampState = 0;
-	LFM.move(70);
-	LBM.move(70);
-	RFM.move(-70);
-	RBM.move(-70);
-	delay(1600);
-	LFM.move(70);
-	LBM.move(70);
-	RFM.move(70);
-	RBM.move(70);
-	delay(660);
-	LFM.move(0);
-	LBM.move(0);
-	RFM.move(0);
-	RBM.move(0);
-	clampState = 1;
-	delay(50);
-	LFM.move(-70);
-	LBM.move(-70);
-	RFM.move(-70);
-	RBM.move(-70);
-	delay(750);
-	LFM.move(0);
-	LBM.move(0);
-	RFM.move(0);
-	RBM.move(0);
-	clampState = 0;
+		LFM.move(127);
+		LBM.move(127);
+		RFM.move(127);
+		RBM.move(127);
+		delay(1800);
+		LFM.move(0);
+		LBM.move(0);
+		RFM.move(0);
+		RBM.move(0);
+		clampState = 1;
+		delay(100);
+		LFM.move(-90);
+		LBM.move(-90);
+		RFM.move(-90);
+		RBM.move(-90);
+		delay(2500);
+		clampState = 0;
+		LFM.move(70);
+		LBM.move(70);
+		RFM.move(-70);
+		RBM.move(-70);
+		delay(1600);
+		LFM.move(70);
+		LBM.move(70);
+		RFM.move(70);
+		RBM.move(70);
+		delay(660);
+		LFM.move(0);
+		LBM.move(0);
+		RFM.move(0);
+		RBM.move(0);
+		clampState = 1;
+		delay(50);
+		LFM.move(-70);
+		LBM.move(-70);
+		RFM.move(-70);
+		RBM.move(-70);
+		delay(750);
+		LFM.move(0);
+		LBM.move(0);
+		RFM.move(0);
+		RBM.move(0);
+		clampState = 0;
 	}
 
 }
 
-/*
-	This is the driver control code
-*/
 void opcontrol() {
 	autonGo = false;
 	usercontrol = true;
-	while (usercontrol) {
-	// Driving
-		// CONTROLLER
-			/*
-				Our team uses the Arcade Control system instad of tank due to its simplicity
-				mPwr is a variable to move the bot forward or backwards based on value from the verticle axis of the left joystick
-				turn is a variable to turning the robot round the center of it, the value of turn is from the horizontial axis of the right joystick
-			*/
-			double mPwr = master.get_analog(ANALOG_LEFT_Y);
-			double turn = master.get_analog(ANALOG_RIGHT_X);
-		// Motors
-			/*
-				(motor).move function moves the motors
-				mPwr moves the bot back and forward
-				turn rotates the robot
-				E.G. if I move the right joystick to the right the
-				left set of the wheels would speed up and the right set would slow down
-			*/
-			LBM.move(mPwr + turn);
-			LFM.move(mPwr + turn);
-			RBM.move(mPwr - turn);
-			RFM.move(mPwr - turn);
+		while (usercontrol) {
+		// Driving
+			// Controller
+				/* Control the robot with the Left Y Axis for forward 
+			   	   and the Right X Axis for turning (Arcade Drive) */
+				double mPwr = master.get_analog(ANALOG_LEFT_Y);
+				double turn = master.get_analog(ANALOG_RIGHT_X);
+			// Motors
+				LBM.move(mPwr + turn);
+				LFM.move(mPwr + turn);
+				RBM.move(mPwr - turn);
+				RFM.move(mPwr - turn);
 		delay(20);
-	}
+		}
 }
