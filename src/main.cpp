@@ -10,16 +10,6 @@
 			// This is if we use a 2nd controller
 			Controller partner (E_CONTROLLER_PARTNER);
 		// Motors
-			/*
-				The initialization of motors requires 4 things
-				Name of the motor
-				Declareing what port the motor is
-				What gearset the motor uses
-					Blue  6:1  E_MOTOR_GEARSET_06
-		Default:	Green 18:1 E_MOTOR_GEARSET_18
-					Red   36:1 E_MOTOR_GEARSET_36
-				And if it's reversed
-			*/
 			Motor LBM(3, E_MOTOR_GEARSET_18 , false);
 			Motor LFM(2, E_MOTOR_GEARSET_18, false);
 			Motor RFM(10, E_MOTOR_GEARSET_18, true);
@@ -30,10 +20,6 @@
 			Distance LIFTO(20);
 	// Tri port
 		// Piston
-			/*
-				ADI is for the tri port
-				CLAMPY is the piston for the front clamp
-			*/
 			ADIDigitalOut CLAMPY(7);
 		// Encoders
 			ADIEncoder LYEN(1, 2, false);
