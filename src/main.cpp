@@ -1,7 +1,6 @@
 // 2976G Tipping Point Code
 
 #include "main.h"
-
 // This is all the electronics
 #include "asignment.h"
 
@@ -25,7 +24,7 @@ void on_center_button() {
 	static bool pressed = false;
 	pressed = !pressed;
 	if (pressed) {
-		lcd::set_text(2, "I was pressed!");
+		lcd::set_text(2, "Made by Phillip, Janzen, Ethn, Blake");
 	} else {
 		lcd::clear_line(2);
 	}
