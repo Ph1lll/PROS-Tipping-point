@@ -1,9 +1,6 @@
 // 2976G Tipping Point Code
 #include "asignment.hpp"
 
-
-
-
 // LLEMU's center button
 void on_center_button() {
 	static bool pressed = false;
@@ -128,7 +125,7 @@ void initialize() {
 
 }
 
-/* PID system for autonomous that hopefully gets implemented
+// PID system for autonomous that hopefully gets implemented
 void drivePID() {
 
 	// Encoders
@@ -176,7 +173,7 @@ void drivePID() {
 
 		delay(20);
 	}
-} */
+} 
 
 
 // Autonomous code
@@ -267,7 +264,7 @@ autonGo = true;
 		RBM.move(0);
 		clampState = 0;
 	}
-}
+} 
 
 void opcontrol() {
 	autonGo = false;
