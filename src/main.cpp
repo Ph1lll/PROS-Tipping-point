@@ -20,10 +20,8 @@ void compReady() {
 		// Controlling what side we want auton to go 
 		if (oleana.get_digital(DIGITAL_X) && !sideAuto) {
 			sideAuto == !sideAuto;
-			delay(20);
 		} else if (oleana.get_digital(DIGITAL_A) && sideAuto) {
 			sideAuto == !sideAuto;
-			delay(20);
 		}
 
 		// Telling the user what side of auton we're using
@@ -39,7 +37,7 @@ void compReady() {
 		while (!readyClamp) {
 			oleana.clear_line(1);
 			oleana.print(1, 0, "Have you pumped the canisters?");
-			if (oleana.get_digital(DIGITAL_A)) readyClamp = true;
+			if (oleana.get_digital(DIGITAL_Y)) readyClamp = true;
 		}
 
 	delay(30);
