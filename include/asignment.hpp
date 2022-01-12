@@ -26,12 +26,12 @@
 
 
 // Global Variables
-bool usercontrol = false;
-bool autonGo = false;
-bool sideAuto = false;
-int liftdir = 0;
-int clampState = 0;
+	bool usercontrol = false;
+	bool autonGo = false;
+	bool sideAuto = false;
+	int liftdir = 0;
+	int clampState = 0;
 
 // PID desired
-double desired = 0;
-double tesired = 0;
+	double desired = 0;
+	double tesired = 0;

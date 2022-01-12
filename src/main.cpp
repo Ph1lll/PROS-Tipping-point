@@ -41,9 +41,8 @@ void compReady() {
 			oleana.print(1, 0, "Have you pumped the canisters?");
 			if (oleana.get_digital(DIGITAL_A)) readyClamp = true;
 		}
-		
 
-		delay(30);
+	delay(30);
 	}
 
 	bool readyLift = false;
@@ -56,7 +55,7 @@ void compReady() {
 			DR4BR.move(0);
 			readyLift = true;
 		}
-		delay(30);
+	delay(30);
 	}
 }
 
@@ -83,7 +82,7 @@ void clampCtrl() {
 	}
 }
 
-// Control function ofr the lift
+// Control function for the lift
 void liftCtrl() {
 	double liftPwr;
 	while(1) {
@@ -173,7 +172,6 @@ void drivePID() {
 		delay(20);
 	}
 } 
-
 
 // Autonomous code
 void autonomous() {
