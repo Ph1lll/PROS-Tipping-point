@@ -2,15 +2,15 @@
 
 // V5 Parts
 	// Controller
-	Controller master (E_CONTROLLER_MASTER);
-	Controller partner (E_CONTROLLER_PARTNER);
+	Controller oleana (CONTROLLER_MASTER);
+	Controller archie (CONTROLLER_PARTNER);
 	// Motors
-	Motor LBM(3, E_MOTOR_GEARSET_18 , false);
-	Motor LFM(2, E_MOTOR_GEARSET_18, false);
-	Motor RFM(10, E_MOTOR_GEARSET_18, true);
-	Motor RBM(1, E_MOTOR_GEARSET_18, true);
-	Motor DR4BL(18, E_MOTOR_GEARSET_36, false);
-	Motor DR4BR(19, E_MOTOR_GEARSET_36, true);
+	Motor LBM(3, MOTOR_GEARSET_18 , false);
+	Motor LFM(2, MOTOR_GEARSET_18, false);
+	Motor RFM(10, MOTOR_GEARSET_18, true);
+	Motor RBM(1, MOTOR_GEARSET_18, true);
+	Motor DR4BL(18, MOTOR_GEARSET_36, false);
+	Motor DR4BR(19, MOTOR_GEARSET_36, true);
 	// Distance
 	Distance LIFTO(20);
 
@@ -20,6 +20,10 @@
 	// Encoders
 	ADIEncoder LYEN(1, 2, false);
 	ADIEncoder RYEN(3, 4, false);
+
+
+
+
 
 // Global Variables
 bool usercontrol = false;

@@ -12,35 +12,34 @@ void on_center_button() {
 	}
 }
 
-// Control for the lift
 // Automatically do some preperations before the match starts
 void compReady() {
+	bool readyClamp = false;
 	while (!autonGo && !usercontrol) {
 
 		// Controlling what side we want auton to go 
-		if (master.get_digital(DIGITAL_X) && !sideAuto) {
+		if (oleana.get_digital(DIGITAL_X) && !sideAuto) {
 			sideAuto == !sideAuto;
 			delay(20);
-		} else if (master.get_digital(DIGITAL_A) && sideAuto) {
+		} else if (oleana.get_digital(DIGITAL_A) && sideAuto) {
 			sideAuto == !sideAuto;
 			delay(20);
 		}
 
 		// Telling the user what side of auton we're using
 		if (sideAuto) {
-			master.clear_line(0);
-			master.print(0, 0, "Auton on the Right");
+			oleana.clear_line(0);
+			oleana.print(0, 0, "Auton on the Right");
 		} else if (!sideAuto) {
-			master.clear_line(0);
-			master.print(0, 0, "Auton on the Left");
+			oleana.clear_line(0);
+			oleana.print(0, 0, "Auton on the Left");
 		} 
 
-		bool readyClamp = false;
 		// Check if we have pumped up the canisters for the clamp
 		while (!readyClamp) {
-			master.clear_line(0);
-			master.print(0, 0, "Have you pumped the canisters?");
-			if (master.get_digital(DIGITAL_A)) readyClamp = true;
+			oleana.clear_line(1);
+			oleana.print(1, 0, "Have you pumped the canisters?");
+			if (oleana.get_digital(DIGITAL_A)) readyClamp = true;
 		}
 		
 
@@ -49,17 +48,19 @@ void compReady() {
 
 	bool readyLift = false;
 	while (!readyLift) {
-		if (LIFTO.get() >= 50) {
+		if (LIFTO.get() >= 60) {
 			DR4BL.move(-80);
 			DR4BR.move(-80);
-		} else if (LIFTO.get() <= 50) { 
+		} else if (LIFTO.get() <= 50) {
+			DR4BL.move(0);
+			DR4BR.move(0);
 			readyLift = true;
 		}
 		delay(30);
 	}
 }
 
-// Control for the clamp
+// Control function for the clamp
 void clampCtrl() {
 	while (1) {
 		// User control
@@ -67,17 +68,13 @@ void clampCtrl() {
 
 			bool psshhh;
 			// Preventing the piston to basically waste the air
-			if (master.get_digital(DIGITAL_L2) && master.get_digital(DIGITAL_L1)) {
-				psshhh = true;
-			} else {
-				psshhh = false;
-			}
-			
-			// User control
-			if (master.get_digital(DIGITAL_L2) && clampState == 0 && !psshhh) {
-				clampState = 1;
-			} else if (master.get_digital(DIGITAL_L1) && clampState == 1 && !psshhh){
-				clampState = 0;
+			if (oleana.get_digital(DIGITAL_L2) ^ oleana.get_digital(DIGITAL_L1)) {
+				// User control
+				if (oleana.get_digital(DIGITAL_L2) && clampState == 0) {
+					clampState = 1;
+				} else if (oleana.get_digital(DIGITAL_L1) && clampState == 1){
+					clampState = 0;
+				}
 			}
 		}
 
@@ -86,6 +83,7 @@ void clampCtrl() {
 	}
 }
 
+// Control function ofr the lift
 void liftCtrl() {
 	double liftPwr;
 	while(1) {
@@ -99,7 +97,7 @@ void liftCtrl() {
 
 		// Controlling the motors
 		if (usercontrol) {
-		liftPwr = 127 * (master.get_digital(DIGITAL_R1) - (master.get_digital(DIGITAL_R2)* liftBtm));
+		liftPwr = 127 * (oleana.get_digital(DIGITAL_R1) - (oleana.get_digital(DIGITAL_R2)* liftBtm));
 		} else if (autonGo) {
 		liftPwr = 70 * liftdir;	
 		}
@@ -111,6 +109,7 @@ void liftCtrl() {
 	}
 }
 
+// Pre-game housekeeping functions
 void initialize() {
 
 	// LCD Welcome
@@ -266,6 +265,7 @@ autonGo = true;
 	}
 } 
 
+// Driver control 
 void opcontrol() {
 	autonGo = false;
 	usercontrol = true;
@@ -274,8 +274,8 @@ void opcontrol() {
 		// Controller
 		/* Control the robot with the Left Y Axis for forward 
 	   	   and the Right X Axis for turning (Arcade Drive) */
-		double mPwr = master.get_analog(ANALOG_LEFT_Y);
-		double turn = master.get_analog(ANALOG_RIGHT_X);
+		double mPwr = oleana.get_analog(ANALOG_LEFT_Y);
+		double turn = oleana.get_analog(ANALOG_RIGHT_X);
 		// Motors
 		LBM.move(mPwr + turn);
 		LFM.move(mPwr + turn);
