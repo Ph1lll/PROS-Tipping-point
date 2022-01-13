@@ -65,7 +65,7 @@ void clampCtrl() {
 
 			bool psshhh;
 			// Preventing the piston to basically waste the air
-			if (oleana.get_digital(DIGITAL_L2) ^ oleana.get_digital(DIGITAL_L1)) {
+			if (!(oleana.get_digital(DIGITAL_L2) && oleana.get_digital(DIGITAL_L1))) {
 				// User control
 				if (oleana.get_digital(DIGITAL_L2) && clampState == 0) {
 					clampState = 1;
