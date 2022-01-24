@@ -121,72 +121,34 @@ void initialize() {
 
 }
 
-// PID system for autonomous that hopefully gets implemented
-void drivePID() {
+bool autonStop = false;
 
-	// Encoders
-	double yPos = LYEN.get_value() + RYEN.get_value();
-	double tspoon  = LYEN.get_value() - RYEN.get_value();
-	// PID system
-    // Position
-  	double error = 0;
-  	double prevError = 0;
-  	double deriv = 0;
-    // Turning
-  	float terror = 0;
-  	float tPrevError = 0;
-  	float teriv = 0;
-
-	// Konstants
-    	// Transform
-  		double kP = 0;
-  		double kI = 0;
-  		double kD = 0;
-    	// Rotate
-  		double tkP = 0;
-  		double tkI = 0;
-  		double tkD = 0;
-
-	while (!usercontrol) {
-		// PID yPos
-  		error = yPos - desired;
-  		prevError += error;
-  		deriv = error - prevError;
-    	// PID Turning
-  		terror = tspoon - tesired;
-  		tPrevError += terror;
-		teriv = terror - tPrevError;
-
-		// Lateral movement
-		double proton = (error * kP) + (prevError * kI) + (deriv * kD);
-		double electron = (terror * tkP) + (tPrevError * tkI) + (teriv * tkD);
-
-    	// Motor Asignment
-	  	LBM.move_velocity(proton + electron);
-      	LFM.move_velocity(proton + electron);
-      	RBM.move_velocity(proton - electron);
-      	RFM.move_velocity(proton - electron);
-
-		delay(20);
+void autonTop() {
+	while (autonGo) {
+		if (autonStop) {
+		LFM.move(0);
+		LBM.move(0);
+		RFM.move(0);
+		RBM.move(0);
+		}
 	}
-} 
+}
 
 // Autonomous code
 void autonomous() {
 autonGo = true;
-	// Task myTask(drivePID);
+Task autonStopBool(autonTop);
+
     if (sideAuto) {
 		LBM.move(127);
 		LFM.move(127);
 		RFM.move(127);
 		RBM.move(127);
 		delay(2400);
-		LFM.move(0);
-		LBM.move(0);
-		RFM.move(0);
-		RBM.move(0);
+		autonStop = true;
 		clampState = 1;
 		delay(100);
+		autonStop = false;
 		LFM.move(-90);
 		LBM.move(-90);
 		RFM.move(-90);
@@ -208,10 +170,8 @@ autonGo = true;
 		RFM.move(-70);
 		RBM.move(-70);
 		delay(350);
-		LFM.move(0);
-		LBM.move(0);
-		RFM.move(0);
-		RBM.move(0);
+		autonStop = true;
+		autonStop = false;
 	
 	} else if (!sideAuto) {
 	
@@ -220,12 +180,10 @@ autonGo = true;
 		RFM.move(127);
 		RBM.move(127);
 		delay(1800);
-		LFM.move(0);
-		LBM.move(0);
-		RFM.move(0);
-		RBM.move(0);
+		autonStop = true;
 		clampState = 1;
 		delay(100);
+		autonStop = false;
 		LFM.move(-90);
 		LBM.move(-90);
 		RFM.move(-90);
@@ -242,22 +200,18 @@ autonGo = true;
 		RFM.move(70);
 		RBM.move(70);
 		delay(660);
-		LFM.move(0);
-		LBM.move(0);
-		RFM.move(0);
-		RBM.move(0);
+		autonStop = true;
 		clampState = 1;
 		delay(50);
+		autonStop = false;
 		LFM.move(-70);
 		LBM.move(-70);
 		RFM.move(-70);
 		RBM.move(-70);
 		delay(750);
-		LFM.move(0);
-		LBM.move(0);
-		RFM.move(0);
-		RBM.move(0);
+		autonStop = true;
 		clampState = 0;
+		autonStop = false;
 	}
 } 
 
