@@ -62,8 +62,6 @@ void clampCtrl() {
 	while (1) {
 		// User control
 		if (usercontrol) {
-
-			bool psshhh;
 			// Preventing the piston to basically waste the air
 			if (!(oleana.get_digital(DIGITAL_L2) && oleana.get_digital(DIGITAL_L1))) {
 				// User control
@@ -94,9 +92,9 @@ void liftCtrl() {
 
 		// Controlling the motors
 		if (usercontrol) {
-		liftPwr = 127 * (oleana.get_digital(DIGITAL_R1) - (oleana.get_digital(DIGITAL_R2)* liftBtm));
+			liftPwr = 127 * (oleana.get_digital(DIGITAL_R1) - (oleana.get_digital(DIGITAL_R2)* liftBtm));
 		} else if (autonGo) {
-		liftPwr = 70 * liftdir;	
+			liftPwr = 70 * liftdir;	
 		}
 		
 		// Lift Motors
@@ -121,27 +119,27 @@ void initialize() {
 
 }
 
+
+// Auton Variables
 bool autonStop = false;
 bool autonFighting = false;
 
 void autonTop() {
 	while (autonGo) {
+		// Checking what the current is (measured by mA)
 		std::cout << "LBM Current Draw: " << LBM.get_current_draw();
 		std::cout << "LFM Current Draw: " << LFM.get_current_draw();
 		std::cout << "RBM Current Draw: " << RBM.get_current_draw();
 		std::cout << "RFM Current Draw: " << RFM.get_current_draw();
 
-		
-
-
-
+		// Stop the Robot 
 		if (autonStop && !autonFighting) {
 		LFM.move(0);
 		LBM.move(0);
 		RFM.move(0);
 		RBM.move(0);
 		}
-		delay(20);
+	delay(20);
 	}
 }
 
