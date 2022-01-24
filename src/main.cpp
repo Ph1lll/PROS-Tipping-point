@@ -131,7 +131,11 @@ void autonTop() {
 		std::cout << "RBM Current Draw: " << RBM.get_current_draw();
 		std::cout << "RFM Current Draw: " << RFM.get_current_draw();
 
-		if (autonStop) {
+		
+
+
+
+		if (autonStop && !autonFighting) {
 		LFM.move(0);
 		LBM.move(0);
 		RFM.move(0);
