@@ -122,15 +122,22 @@ void initialize() {
 }
 
 bool autonStop = false;
+bool autonFighting = false;
 
 void autonTop() {
 	while (autonGo) {
+		std::cout << "LBM Current Draw: " << LBM.get_current_draw();
+		std::cout << "LFM Current Draw: " << LFM.get_current_draw();
+		std::cout << "RBM Current Draw: " << RBM.get_current_draw();
+		std::cout << "RFM Current Draw: " << RFM.get_current_draw();
+
 		if (autonStop) {
 		LFM.move(0);
 		LBM.move(0);
 		RFM.move(0);
 		RBM.move(0);
 		}
+		delay(20);
 	}
 }
 
