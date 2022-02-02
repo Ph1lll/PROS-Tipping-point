@@ -12,9 +12,13 @@ void on_center_button() {
 	}
 }
 
+
+
+
 // Automatically do some preperations before the match starts
 void compReady() {
 	bool readyClamp = false;
+	bool readyLift = false;
 	while (!autonGo && !usercontrol) {
 
 		// Controlling what side we want auton to go 
@@ -40,11 +44,7 @@ void compReady() {
 			if (oleana.get_digital(DIGITAL_Y)) readyClamp = true;
 		}
 
-	delay(30);
-	}
-
-	bool readyLift = false;
-	while (!readyLift) {
+		while (!readyLift) {
 		if (LIFTO.get() >= 60) {
 			DR4BL.move(-80);
 			DR4BR.move(-80);
@@ -53,8 +53,13 @@ void compReady() {
 			DR4BR.move(0);
 			readyLift = true;
 		}
+		}
+
 	delay(30);
 	}
+
+	
+	
 }
 
 // Control function for the clamp
