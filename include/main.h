@@ -36,11 +36,10 @@
 
 #include "api.h"
 
-
 /**
  * You should add more #includes here
  */
- //#include "okapi/api.hpp"
+//#include "okapi/api.hpp"
 //#include "pros/api_legacy.h"
 
 /**
@@ -62,17 +61,18 @@ using namespace pros::literals;
  * button press in opcontrol() for testing purposes).
  */
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-void autonomous(void);
-void initialize(void);
-void disabled(void);
-void competition_initialize(void);
-void opcontrol(void);
-void autonmo(void);
-void clampCtrl(void);
-void liftCtrl(void);
-void drivePID(void);
+    void autonomous(void);
+    void initialize(void);
+    void disabled(void);
+    void competition_initialize(void);
+    void opcontrol(void);
+    void autonmo(void);
+    void clampCtrl(void);
+    void liftCtrl(void);
+    void drivePID(void);
 #ifdef __cplusplus
 }
 #endif
@@ -84,4 +84,4 @@ void drivePID(void);
 //#include <iostream>
 #endif
 
-#endif  // _PROS_MAIN_H_
+#endif // _PROS_MAIN_H_
