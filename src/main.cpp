@@ -16,6 +16,18 @@ void on_center_button()
 	}
 }
 
+void driveTrain()
+{
+	while (1)
+	{
+		LBM.move(mPwr + turn);
+		LFM.move(mPwr + turn);
+		RBM.move(mPwr - turn);
+		RFM.move(mPwr - turn);
+		delay(20);
+	}
+}
+
 // Automatically do some preperations before the match starts
 void compReady()
 {
@@ -82,22 +94,21 @@ void clampCtrl()
 		// User control
 		if (usercontrol)
 		{
-			// Preventing the piston to basically waste the air
-			if (!(oleana.get_digital(DIGITAL_L2) && oleana.get_digital(DIGITAL_L1)))
+			// Lift Clamp
+			if (oleana.get_digital_new_press(DIGITAL_L1))
 			{
-				// User control
-				if (oleana.get_digital(DIGITAL_L2) && clampState == 0)
-				{
-					clampState = 1;
-				}
-				else if (oleana.get_digital(DIGITAL_L1) && clampState == 1)
-				{
-					clampState = 0;
-				}
+				clampLiftState = (clampLiftState == 1) ? 0 : 1;
+			}
+
+			// Lower Clamp
+			if (oleana.get_digital_new_press(DIGITAL_L2))
+			{
+				clampLowerState = (clampLowerState == 1) ? 0 : 1;
 			}
 		}
 
-		CLAMPY.set_value(clampState);
+		liftClampy.set_value(clampLiftState);
+		lowerClampy.set_value(clampLowerState);
 		delay(20);
 	}
 }
@@ -123,10 +134,8 @@ void liftCtrl()
 		if (usercontrol)
 		{
 			liftPwr = 127 * (oleana.get_digital(DIGITAL_R1) - (oleana.get_digital(DIGITAL_R2) * liftBtm));
-		}
-		else if (autonGo)
-		{
-			liftPwr = 70 * liftdir;
+		} else if (autonGo) {
+			liftPwr = 80 * liftdir * liftBtm;
 		}
 
 		// Lift Motors
@@ -148,13 +157,13 @@ void initialize()
 	// Switching on tasks
 	Task clampControl(clampCtrl);
 	Task liftControl(liftCtrl);
+	Task driving(driveTrain);
 	compReady();
 }
 
 // Auton Variables
 bool autonStop = false;
 bool autonFighting = false;
-
 void autonTop()
 {
 	while (autonGo)
@@ -168,10 +177,14 @@ void autonTop()
 		// Stop the Robot
 		if (autonStop && !autonFighting)
 		{
-			LFM.move(0);
-			LBM.move(0);
-			RFM.move(0);
-			RBM.move(0);
+			mPwr = 0;
+			turn = 0;
+			autonStop = false;
+		}
+
+		if (usercontrol)
+		{
+			break;
 		}
 		delay(20);
 	}
@@ -180,105 +193,96 @@ void autonTop()
 // Autonomous code
 void autonomous()
 {
+	double liftTime = 500;
 	autonGo = true;
 	Task autonStopBool(autonTop);
 
 	if (sideAuto)
 	{
-		LBM.move(127);
-		LFM.move(127);
-		RFM.move(127);
-		RBM.move(127);
+		mPwr = 127;
 		delay(2400);
 		autonStop = true;
-		clampState = 1;
+		clampLiftState = 1;
 		delay(100);
-		autonStop = false;
-		LFM.move(-90);
-		LBM.move(-90);
-		RFM.move(-90);
-		RBM.move(-90);
-		delay(3000);
-		clampState = 0;
-		LFM.move(70);
-		LBM.move(70);
-		RFM.move(-70);
-		RBM.move(-70);
+		liftdir = 1;
+		mPwr = -90;
+		delay(liftTime);
+		liftdir = 0;
+		delay(2500);
+		mPwr = 0;
+		liftdir = -1;
+		delay(liftTime);
+		liftdir = 0;
+		clampLiftState = 0;
+		turn = 70;
 		delay(1600);
-		LFM.move(70);
-		LBM.move(70);
-		RFM.move(70);
-		RBM.move(70);
+		turn = 0;
+		mPwr = 70;
 		delay(750);
-		LFM.move(-70);
-		LBM.move(-70);
-		RFM.move(-70);
-		RBM.move(-70);
+		mPwr = -70;
 		delay(350);
-		autonStop = true;
-		autonStop = false;
+		mPwr = 0;
 	}
 	else if (!sideAuto)
 	{
-
-		LFM.move(127);
-		LBM.move(127);
-		RFM.move(127);
-		RBM.move(127);
+		mPwr = 127;
 		delay(1800);
 		autonStop = true;
-		clampState = 1;
+		clampLiftState = 1;
 		delay(100);
-		autonStop = false;
-		LFM.move(-90);
-		LBM.move(-90);
-		RFM.move(-90);
-		RBM.move(-90);
-		delay(2500);
-		clampState = 0;
-		LFM.move(70);
-		LBM.move(70);
-		RFM.move(-70);
-		RBM.move(-70);
+		mPwr = -90;
+		liftdir = 1;
+		delay(liftTime);
+		liftdir = 0;
+		delay(2000);
+		mPwr = 0;
+		liftdir = -1;
+		delay(liftTime);
+		liftdir = 0;
+		clampLiftState = 0;
+		delay(100);
+		turn = 70;
 		delay(1600);
-		LFM.move(70);
-		LBM.move(70);
-		RFM.move(70);
-		RBM.move(70);
+		turn = 0;
+		mPwr = 70;
 		delay(660);
 		autonStop = true;
-		clampState = 1;
+		clampLiftState = 1;
 		delay(50);
-		autonStop = false;
-		LFM.move(-70);
-		LBM.move(-70);
-		RFM.move(-70);
-		RBM.move(-70);
-		delay(750);
+		liftdir = 1;
+		mPwr = -70;
+		delay(liftTime);
+		liftdir = 0;
+		delay(250);
 		autonStop = true;
-		clampState = 0;
-		autonStop = false;
+		liftdir = -1;
+		delay(liftTime);
+		liftdir = 0;
+		clampLiftState = 0;
 	}
 }
 
 // Driver control
 void opcontrol()
 {
+	int rev = 0;
 	autonGo = false;
 	usercontrol = true;
 	while (usercontrol)
 	{
-		// Driving
 		// Controller
-		/* Control the robot with the Left Y Axis for forward 
-	   	   and the Right X Axis for turning (Arcade Drive) */
-		double mPwr = oleana.get_analog(ANALOG_LEFT_Y);
-		double turn = oleana.get_analog(ANALOG_RIGHT_X);
-		// Motors
-		LBM.move(mPwr + turn);
-		LFM.move(mPwr + turn);
-		RBM.move(mPwr - turn);
-		RFM.move(mPwr - turn);
+		mPwr = (oleana.get_analog(ANALOG_LEFT_Y) * rev);
+		turn = (oleana.get_analog(ANALOG_RIGHT_X) * rev);
+
+		if (oleana.get_digital_new_press(DIGITAL_DOWN) && rev == 0)
+		{
+			rev = 1;
+		}
+		else if (oleana.get_digital_new_press(DIGITAL_DOWN) && rev == 1)
+		{
+			rev = 0;
+		}
+
 		delay(20);
 	}
 }
