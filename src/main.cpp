@@ -4,8 +4,7 @@
 // LLEMU's center button
 void on_center_button()
 {
-	static bool pressed = false;
-	pressed = !pressed;
+	static bool pressed = !pressed;
 	if (pressed)
 	{
 		lcd::set_text(2, "Made by Phillip, Janzen, Ethn, Blake");
@@ -16,6 +15,7 @@ void on_center_button()
 	}
 }
 
+// Function for controlling the drivetrain
 void driveTrain()
 {
 	while (1)
@@ -67,6 +67,7 @@ void compReady()
 				readyClamp = true;
 		}
 
+		// Ensuring that the robot's lift is lowered
 		while (!readyLift)
 		{
 			if (LIFTO.get() >= 60)
@@ -86,7 +87,7 @@ void compReady()
 	}
 }
 
-// Control function for the clamp
+// Control function for the clamps
 void clampCtrl()
 {
 	while (1)
@@ -134,7 +135,9 @@ void liftCtrl()
 		if (usercontrol)
 		{
 			liftPwr = 127 * (oleana.get_digital(DIGITAL_R1) - (oleana.get_digital(DIGITAL_R2) * liftBtm));
-		} else if (autonGo) {
+		}
+		else if (autonGo)
+		{
 			liftPwr = 80 * liftdir * liftBtm;
 		}
 
@@ -158,7 +161,7 @@ void initialize()
 	Task clampControl(clampCtrl);
 	Task liftControl(liftCtrl);
 	Task driving(driveTrain);
-	compReady();
+	Task comy(compReady);
 }
 
 // Auton Variables
