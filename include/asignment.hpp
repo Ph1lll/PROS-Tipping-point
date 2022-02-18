@@ -5,15 +5,15 @@ Controller oleana(CONTROLLER_MASTER);
 Controller archie(CONTROLLER_PARTNER);
 
 // Motors
-Motor LBM(3, MOTOR_GEARSET_18, false);
-Motor LFM(2, MOTOR_GEARSET_18, false);
-Motor RFM(10, MOTOR_GEARSET_18, true);
-Motor RBM(1, MOTOR_GEARSET_18, true);
+Motor LBM(2, MOTOR_GEARSET_18, false);
+Motor LFM(10, MOTOR_GEARSET_18, false);
+Motor RFM(9, MOTOR_GEARSET_18, true);
+Motor RBM(20, MOTOR_GEARSET_18, true);
 Motor DR4BL(11, MOTOR_GEARSET_36, false);
 Motor DR4BR(12, MOTOR_GEARSET_36, true);
 
 // Distance
-Distance LIFTO(20);
+Distance LIFTO(19);
 
 // Pistons
 ADIDigitalOut liftClampy(2);
@@ -26,5 +26,6 @@ bool sideAuto = false;
 int liftdir = 0;
 int clampLiftState = 0;
 int clampLowerState = 0;
-double mPwr = 0;
-double turn = 0;
+int mPwr = 0;
+int turn = 0;
+

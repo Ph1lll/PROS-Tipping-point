@@ -7,7 +7,7 @@ void on_center_button()
 	static bool pressed = !pressed;
 	if (pressed)
 	{
-		lcd::set_text(2, "Made by Phillip, Janzen, Ethn, Blake");
+		lcd::set_text(2, "Made by Phillip, Janzen, Ethn, Blake, and Frank");
 	}
 	else
 	{
@@ -117,6 +117,9 @@ void clampCtrl()
 // Control function for the lift
 void liftCtrl()
 {
+	DR4BL.set_brake_mode(MOTOR_BRAKE_HOLD);
+	DR4BR.set_brake_mode(MOTOR_BRAKE_HOLD);
+
 	double liftPwr;
 	while (1)
 	{
@@ -141,6 +144,7 @@ void liftCtrl()
 			liftPwr = 80 * liftdir * liftBtm;
 		}
 
+
 		// Lift Motors
 		DR4BL.move(liftPwr);
 		DR4BR.move(liftPwr);
@@ -161,7 +165,6 @@ void initialize()
 	Task clampControl(clampCtrl);
 	Task liftControl(liftCtrl);
 	Task driving(driveTrain);
-	Task comy(compReady);
 }
 
 // Auton Variables
@@ -268,24 +271,23 @@ void autonomous()
 // Driver control
 void opcontrol()
 {
-	int rev = 0;
 	autonGo = false;
 	usercontrol = true;
+	int rev = 1;
 	while (usercontrol)
 	{
-		// Controller
-		mPwr = (oleana.get_analog(ANALOG_LEFT_Y) * rev);
-		turn = (oleana.get_analog(ANALOG_RIGHT_X) * rev);
+		oleana.print(1, 0, "Driver Control");
 
-		if (oleana.get_digital_new_press(DIGITAL_DOWN) && rev == 0)
+		if (usercontrol)
 		{
-			rev = 1;
-		}
-		else if (oleana.get_digital_new_press(DIGITAL_DOWN) && rev == 1)
-		{
-			rev = 0;
-		}
+			// Controller
+			mPwr = (oleana.get_analog(ANALOG_LEFT_Y) * rev);
+			turn = oleana.get_analog(ANALOG_RIGHT_X);
 
-		delay(20);
+			if (oleana.get_digital_new_press(DIGITAL_DOWN))
+			{
+				rev = (rev == 1) ? -1 : 1;
+			}
+		}
 	}
 }
