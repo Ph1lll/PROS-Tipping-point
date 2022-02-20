@@ -37,11 +37,7 @@ void compReady()
 	{
 
 		// Controlling what side we want auton to go
-		if (oleana.get_digital(DIGITAL_X) && !sideAuto)
-		{
-			sideAuto == !sideAuto;
-		}
-		else if (oleana.get_digital(DIGITAL_A) && sideAuto)
+		if (oleana.get_digital(DIGITAL_X))
 		{
 			sideAuto == !sideAuto;
 		}
@@ -50,19 +46,19 @@ void compReady()
 		if (sideAuto)
 		{
 			oleana.clear_line(0);
-			oleana.print(0, 0, "Auton on the Right");
+			oleana.print(1, 0, "Auton on the Right");
 		}
 		else if (!sideAuto)
 		{
 			oleana.clear_line(0);
-			oleana.print(0, 0, "Auton on the Left");
+			oleana.print(1, 0, "Auton on the Left");
 		}
 
 		// Check if we have pumped up the canisters for the clamp
 		while (!readyClamp)
 		{
 			oleana.clear_line(1);
-			oleana.print(1, 0, "Have you pumped the canisters?");
+			oleana.print(2, 0, "Have you pumped the canisters?");
 			if (oleana.get_digital(DIGITAL_Y))
 				readyClamp = true;
 		}
@@ -83,6 +79,7 @@ void compReady()
 			}
 		}
 
+		if (usercontrol) break;
 		delay(30);
 	}
 }
@@ -287,6 +284,11 @@ void opcontrol()
 			if (oleana.get_digital_new_press(DIGITAL_DOWN))
 			{
 				rev = (rev == 1) ? -1 : 1;
+				if (rev == -1) {
+				oleana.print(0,0, "Reversed");
+				} else {
+				oleana.print(0,0, "0");	
+				}
 			}
 		}
 	}
