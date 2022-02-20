@@ -291,5 +291,6 @@ void opcontrol()
 				}
 			}
 		}
+		delay(20);
 	}
 }
