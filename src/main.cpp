@@ -1,5 +1,5 @@
 // 2976G Tipping Point Code
-#include "asignment.hpp"
+#include "assignment.hpp"
 
 // LLEMU's center button
 void on_center_button()
@@ -7,7 +7,7 @@ void on_center_button()
 	static bool pressed = !pressed;
 	if (pressed)
 	{
-		lcd::set_text(2, "Made by Phillip, Janzen, Ethn, Blake, and Frank");
+		lcd::set_text(2, "Made by Phillip, Janzen, \n Ethn, Blake, and Frank");
 	}
 	else
 	{
@@ -66,12 +66,12 @@ void compReady()
 		// Ensuring that the robot's lift is lowered
 		while (!readyLift)
 		{
-			if (LIFTO.get() >= 60)
+			if (LIFTO.get() >= 140)
 			{
 				DR4BL.move(-80);
 				DR4BR.move(-80);
 			}
-			else if (LIFTO.get() <= 50)
+			else if (LIFTO.get() <= 145)
 			{
 				DR4BL.move(0);
 				DR4BR.move(0);
@@ -79,7 +79,8 @@ void compReady()
 			}
 		}
 
-		if (usercontrol) break;
+		if (usercontrol)
+			break;
 		delay(30);
 	}
 }
@@ -118,29 +119,21 @@ void liftCtrl()
 	DR4BR.set_brake_mode(MOTOR_BRAKE_HOLD);
 
 	double liftPwr;
+	int liftBtm;
 	while (1)
 	{
 		// Check if the lift bottomed out
-		int liftBtm;
-		if (LIFTO.get() <= 30)
-		{
-			liftBtm = 0;
-		}
-		else if (LIFTO.get() >= 55)
-		{
-			liftBtm = 1;
-		}
+		liftBtm = (LIFTO.get() <= 115 || (oleana.get_digital(DIGITAL_R1) && LIFTO.get() >= 400)) ? 0:1;
 
 		// Controlling the motors
 		if (usercontrol)
 		{
-			liftPwr = 127 * (oleana.get_digital(DIGITAL_R1) - (oleana.get_digital(DIGITAL_R2) * liftBtm));
+			liftPwr = 127 * ((oleana.get_digital(DIGITAL_R1) * liftBtm) - (oleana.get_digital(DIGITAL_R2) * liftBtm));
 		}
 		else if (autonGo)
 		{
 			liftPwr = 80 * liftdir * liftBtm;
 		}
-
 
 		// Lift Motors
 		DR4BL.move(liftPwr);
@@ -284,10 +277,13 @@ void opcontrol()
 			if (oleana.get_digital_new_press(DIGITAL_DOWN))
 			{
 				rev = (rev == 1) ? -1 : 1;
-				if (rev == -1) {
-				oleana.print(0,0, "Reversed");
-				} else {
-				oleana.print(0,0, "0");	
+				if (rev == -1)
+				{
+					oleana.print(0, 0, "Reversed");
+				}
+				else
+				{
+					oleana.print(0, 0, "0");
 				}
 			}
 		}

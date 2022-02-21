@@ -26,6 +26,5 @@ bool sideAuto = false;
 uint8_t liftdir = 0;
 uint8_t clampLiftState = 0;
 uint8_t clampLowerState = 0;
-uint8_t mPwr = 0;
-uint8_t turn = 0;
-
+int mPwr = 0;
+int turn = 0;
