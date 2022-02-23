@@ -69,7 +69,6 @@ extern "C"
     void disabled(void);
     void competition_initialize(void);
     void opcontrol(void);
-    void autonmo(void);
     void clampCtrl(void);
     void liftCtrl(void);
     void drivePID(void);
